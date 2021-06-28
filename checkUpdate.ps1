@@ -26,9 +26,8 @@ $headers.Add("Content-Type", "application/json")
 foreach($server in $server2019){
     $result = fetchUpdates($server)
     $body = $result | Select-Object Title,PSComputerName,MaxDownloadSize,IsDownloaded,IsInstalled,LastDeploymentChangeTime,RebootRequired,SupportUrl | ConvertTo-Json 
-    $body
     # $result | Select-Object Title,PSComputerName,RebootRequired,MaxDownloadSize,Description | Export-Csv -Path (".\servers.csv") -Append -NoTypeInformation -Encoding UTF8 -Delimiter ";"
     # Invoke-WebRequest -Uri "http://127.0.0.1:5000/" -Method POST -Body $body
-    $response = Invoke-RestMethod 'http://127.0.0.1:5000/update/data' -Method 'POST' -Body $body -ContentType "application/json"
-    $response | ConvertTo-Json
+    $response = Invoke-RestMethod 'http://127.0.0.1:5000/update/data' -Method 'POST' -Body $body -ContentType "application/json";
+    $response | ConvertTo-Json;
 }
