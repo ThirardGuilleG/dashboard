@@ -1,3 +1,4 @@
+{% from "macro/pagination.html" import render_pagination with context %}
 {% extends 'base.html' %}
   {% block content %}
     <div class="row">
@@ -16,15 +17,30 @@
                     {{ th }}
                   </th>
                   {% endfor %}
+                  <th>
+                    Action
+                  </th>
                 </thead>
                 <tbody>
                 {% for row in rows %}
                   <tr>
                     {% for value in row %}
                       <td>
+                      {% if value == True%}
+                        <i class="material-icons">
+                          task_alt
+                        </i>
+                      {% elif value == False %}
+                          <i class="material-icons">highlight_off</i>
+                      {% else %}
                         {{ value }}
+                      {% endif %}
                       </td>
                     {% endfor %}
+                    <td>
+                    <a href="{{ url_for('update.validate', idServer=1,idUpdate=2)}}"
+                      <button type="button" class="btn btn-success">Valider</button></a>
+                    </td>
                   </tr>
                 {% endfor %}
                 </tbody>
@@ -32,6 +48,10 @@
             </div>
           </div>
         </div>
+        {% if pagination %}
+          {{ render_pagination(pagination, endpoint) }}
+       {% endif %}
       </div>
     </div>
   {% endblock %}
+  
