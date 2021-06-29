@@ -1,0 +1,64 @@
+{% from "macro/pagination.html" import render_pagination with context %}
+{% from "macro/modify_delete.html" import action with context %}
+{% extends 'base.html' %}
+  {% block content %}
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header card-header-primary">
+            <h4 class="card-title ">{{ title }}</h4>
+            <p class="card-category">{{ description }}</p>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table">
+                <thead class=" text-primary">
+                {% for th in names %}
+                  <th>
+                    {{ th }}
+                  </th>
+                  {% endfor %}
+                   {% if modifyUrl and deleteUrl %}
+                  <th>
+                    Action
+                  </th>
+                  {% endif %}
+                </thead>
+                <tbody>
+                {% for row in rows %}
+                  <tr>
+                    {% for value in row %}
+                      <td>
+                        {{ value }}
+                      </td>
+                    {% endfor %}
+                    {% if modifyUrl and deleteUrl %}
+                    <td>
+                      {{ action(url_for(modifyUrl,idServer=row[0]),url_for(deleteUrl,idServer=1))}}
+                    </td>
+                    {% endif %}
+                  </tr>
+                {% endfor %}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+          <div class="row">
+            <div class="col-sm">
+              {% if pagination %}
+                {{ render_pagination(pagination, endpoint) }}
+              {% endif %}
+            </div>
+            <div class="col-sm">
+              <a href="{{ url_for('admin.add_server') }}"
+                <button type="button" class="btn btn-success float-right">Ajouter</button>
+              </a>
+            </div>
+          </div>
+        
+        
+      </div>
+    </div>
+  {% endblock %}
+  
