@@ -1,0 +1,6 @@
+{% macro action(urlModif, urlDelete , endpoint) %}
+{% if urlModif and urlDelete %}
+    <a href="{{ urlModif }}"><button type="button" class="btn btn-info">Modifier</button></a>
+    <a href="{{ urlDelete }}"><button type="button" class="btn btn-danger">Supprimer</button></a>
+{% endif %}
+{% endmacro %}
