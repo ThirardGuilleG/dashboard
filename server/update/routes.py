@@ -1,6 +1,7 @@
 from flask import Blueprint, request, jsonify, render_template
 from datetime import datetime
 import json, re
+from flask_sqlalchemy import Pagination
 from loguru import logger
 from database.models import Server, Update, get_db, UpdateAssociation
 
@@ -66,7 +67,7 @@ def update(idServer):
     ["Une MAJ intéressante 2", 125, True, True, "https://wow.fr", "25/12/20", "28/06/21 14h00"],
     ["Une MAJ intéressante 3", 125, True, True, "https://wow.fr", "25/12/20", "28/06/21 14h00"]]
     # updates = UpdateAssociation.query.filter_by(idServer=idServeur).all()
-    updates = db.session.query(UpdateAssociation).join(Update, UpdateAssociation.update).filter(UpdateAssociation.idServer==idServer).all()
+    updates = db.session.query(UpdateAssociation).filter(UpdateAssociation.idServer==idServer).join(Update, UpdateAssociation.update).all()
     rows = []
     print(updates)
     for row in updates:
@@ -76,7 +77,12 @@ def update(idServer):
         # if update:
         #     information = [update.title, update.maxSize, row.rebootrequired, row.installed, update.date]
     myServer = Server.query.get_or_404(idServer)
-    return render_template('tables.html', title= f"{myServer.name}",description=f"Voici toutes les mises à jours pour : {myServer.name}", names=names, rows=rows)
+    return render_template('tables.html', title= f"{myServer.name}",description=f"Voici toutes les mises à jours pour : {myServer.name}", names=names, rows=rows, pagination=[], endpoint=[])
+
+
+@updateB.route('/validate/<int:idUpdate>/<int:idServer>')
+def validate(idUpdate,idServer):
+    return "Not implemented"
 
 
 @updateB.route("/test", methods=['GET', 'POST'])
