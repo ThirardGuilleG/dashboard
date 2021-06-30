@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% block content %}
+    <div class="row">
+        {% for server in servers %}
+            <div class="col-md-4">
+                <div class="card card-profile">
+                    <div class="card-avatar">
+                        <a href="javascript:;">
+                        <img class="img" src="{{ url_for('static', filename='img/faces/19.jpg') }}"> {# TODO trouver img (en fonction de l'os ?)#}
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <h6 class="card-category text-gray">IP : {{ server['ip'] }} | Version {{ server['version'] }}</h6>
+                        <h4 class="card-title">{{ server['name'] }}</h4>
+                        <p class="card-description">
+                        Don't be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens’ bed design but the back is...
+                        Don't be scared of the truth because we need to restart the human foundation in truth And I love you like Kanye loves Kanye I love Rick Owens’ bed design but the back is...
+                        </p>
+                        <a href="{{ url_for('update.update', idServer=server['id']) }}" class="btn btn-primary btn-round">Update</a>
+                        <a href="{{ url_for('admin.servers') }}" class="btn btn-primary btn-round">Gestion</a>
+                        <a href="" class="btn btn-primary btn-round">?</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock  %}
