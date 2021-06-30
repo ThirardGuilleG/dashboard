@@ -27,24 +27,28 @@ def data():
             time = update.get('LastDeploymentChangeTime')
             timestamp = int(re.search(r'\d+', time[0:16]).group())
             date = datetime.fromtimestamp(timestamp)
+            logger.info(f'Mise à jour récupérée pour : {server}')
             # Server
             myServer = Server.query.filter_by(name=server).first()
             if not myServer:
+                logger.warning("le serveur n'est pas en bdd")
                 return jsonify("erreur",200)
             myUpdate = Update.query.filter_by(title=nameUpdate).first()
             if not myUpdate:
                 # Création de la MAJ 
+                logger.debug(f"Création de la MAJ : {nameUpdate}")
                 newUpdate = Update(title=nameUpdate,maxSize=maxSize,date=date,url=url)
                 myUpdate = newUpdate
             modifyinformation = UpdateAssociation.query.filter_by(idUpdate=myUpdate.id,idServer=myServer.id).first()
             if modifyinformation:
                 # mise à jour des informations
+                logger.debug(f"L'association entre la MAJ {modifyinformation} existe déjà modification des informations")
                 modifyinformation.installed = installed
                 modifyinformation.rebootRequired = reboot
                 modifyinformation.date = datetime.now()
                 db.session.add(modifyinformation)
             else:
-                logger.debug(myUpdate)
+                logger.debug(f"Création de l'association pour la MAJ {myUpdate} et server : {server}")
                 with db.session.no_autoflush:
                     # Création de l'association
                     association = UpdateAssociation(done=False,installed=installed, rebootrequired=reboot,date=datetime.now()) # ajout des données en plus
@@ -56,7 +60,7 @@ def data():
                     # db.session.add(myUpdate)
                     myServer.updates.append(association)
                     db.session.add(myServer)
-                    db.session.commit()
+            db.session.commit()
         return jsonify("ok", 200)
 
 
