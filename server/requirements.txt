@@ -4,3 +4,4 @@ flask_admin == 1.5.8
 loguru
 flask_wtf
 flask_bootstrap
+flask-migrate == 3.0.1
