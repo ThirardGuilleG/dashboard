@@ -1,8 +1,3 @@
-$server2019 = @("SRVT2SMTP","SRVT2WP", "SRVT2RDS", "SRVT2EB1",  "SRVT2EB2", "SRVY2WP", "SRVY2SQL", "SRVY2ARR", "SRVY2IISA", "SRVY2IISB", "SRVY2RPT", "SRVT2ETL",
-                "VMCOMMUNICATION", "VMBOA", "SRVT2OXO", "SRVT2FS")
-
-
-# (Get-HotFix -ComputerName "SRVT2WP" | Sort-Object -Property InstalledOn)[-1]
 
 function fetchUpdates($pNameServer){
     $r =Invoke-Command -ComputerName $pNameServer -ScriptBlock {
@@ -24,26 +19,16 @@ function getServers(){
 }
 
 function main(){
-    $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-    $headers.Add("Content-Type", "application/json")
-
-    foreach($server in $server2019){
-        $result = fetchUpdates($server)
+    $servers = getServers | ConvertFrom-Json
+    foreach($server in $servers){
+        $Name,$ip = $server.value
+        Write-Host("Fetch update pour $($Name) ip : $($ip)")
+        $result = fetchUpdates($Name)
         $body = $result | Select-Object Title,PSComputerName,MaxDownloadSize,IsDownloaded,IsInstalled,LastDeploymentChangeTime,RebootRequired,SupportUrl | ConvertTo-Json 
-        # $result | Select-Object Title,PSComputerName,RebootRequired,MaxDownloadSize,Description | Export-Csv -Path (".\servers.csv") -Append -NoTypeInformation -Encoding UTF8 -Delimiter ";"
-        # Invoke-WebRequest -Uri "http://127.0.0.1:5000/" -Method POST -Body $body
         $response = Invoke-RestMethod 'http://127.0.0.1:5000/update/data' -Method 'POST' -Body $body -ContentType "application/json";
-        $response | ConvertTo-Json;
+        $response
     }
 }
 
 
-$servers = getServers | ConvertFrom-Json
-foreach($server in $servers){
-    $Name,$ip = $server.value
-    Write-Host("Fetch update pour $($Name) ip : $($ip)")
-    $result = fetchUpdates($Name)
-    $body = $result | Select-Object Title,PSComputerName,MaxDownloadSize,IsDownloaded,IsInstalled,LastDeploymentChangeTime,RebootRequired,SupportUrl | ConvertTo-Json 
-    $response = Invoke-RestMethod 'http://127.0.0.1:5000/update/data' -Method 'POST' -Body $body -ContentType "application/json";
-    $response
-}
+
