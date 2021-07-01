@@ -2,6 +2,7 @@ from flask import Blueprint, request, jsonify, render_template
 from datetime import datetime
 import json, re
 from flask_sqlalchemy import Pagination
+from sqlalchemy import and_
 from loguru import logger
 from database.models import Server, Update, get_db, UpdateAssociation
 
@@ -66,14 +67,11 @@ def data():
 
 @updateB.route('/<int:idServer>')
 def update(idServer):
-    names = ['Titre', "Taille Max(Mo)", "Demande un redémarrage", "Installé", "Lien + information", "date de sortie", "dernière MAJ"]
-    rows = [["Une MAJ intéressante", 125, True, True, "https://wow.fr", "25/12/20", "28/06/21 14h00"], 
-    ["Une MAJ intéressante 2", 125, True, True, "https://wow.fr", "25/12/20", "28/06/21 14h00"],
-    ["Une MAJ intéressante 3", 125, True, True, "https://wow.fr", "25/12/20", "28/06/21 14h00"]]
+    names = ['Titre mise à jour', "Taille Max(Mo)", "Demande un redémarrage", "Installé", "Lien + information", "date de sortie", "dernière MAJ"]
     # updates = UpdateAssociation.query.filter_by(idServer=idServeur).all()
-    updates = db.session.query(UpdateAssociation).filter(UpdateAssociation.idServer==idServer).join(Update, UpdateAssociation.update).all()
+    updates = db.session.query(UpdateAssociation).filter(and_(UpdateAssociation.idServer==idServer,UpdateAssociation.done==False)).join(Update, UpdateAssociation.update).all()
     rows = []
-    print(updates)
+    ids = [ (update.idServer,update.idUpdate) for update in updates]
     for row in updates:
         update = row.update
         rows.append([update.title, update.maxSize/1000000, row.rebootrequired, row.installed,update.url ,update.date, row.date])
@@ -81,17 +79,24 @@ def update(idServer):
         # if update:
         #     information = [update.title, update.maxSize, row.rebootrequired, row.installed, update.date]
     myServer = Server.query.get_or_404(idServer)
-    return render_template('tables.html', title= f"{myServer.name}",description=f"Voici toutes les mises à jours pour : {myServer.name}", names=names, rows=rows, pagination=[], endpoint=[])
+    return render_template('update/view.html', title= f"{myServer.name}",description=f"Voici toutes les mises à jours pour : {myServer.name}", names=names, rows=rows,ids=ids)
 
 
-@updateB.route('/validate/<int:idUpdate>/<int:idServer>')
+@updateB.get('/last', defaults={'page':1})
+@updateB.get('/last/<int:page>')
+def last_update(page):
+    names = ['Titre mise à jour', "serveur", "date de sortie", "dernière MAJ"]
+    updates = db.session.query(UpdateAssociation).filter(UpdateAssociation.done==False).join(Update, UpdateAssociation.update).paginate(page=page,per_page=10)
+    ids = [(update.idServer,update.idUpdate) for update in updates.items]
+    rows = [(row.update.title, "test" ,row.update.date, row.date) for row in updates.items]
+    return render_template('update/tables.html', title= "Dernière mise a jours", names=names, rows=rows,ids=ids, pagination=updates,endpoint='update.last_update')
+
+
+@updateB.route('/validate/<int:idServer>/<int:idUpdate>')
 def validate(idUpdate,idServer):
     return "Not implemented"
 
 
 @updateB.route("/test", methods=['GET', 'POST'])
 def test():
-    server = Server(name="SRVT2WP", ip="10.33.1.221")
-    db.session.add(server)
-    db.session.commit()
-    return "ok"
+    return render_template('update/view.html')
