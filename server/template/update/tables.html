@@ -1,0 +1,57 @@
+{% from "macro/pagination.html" import render_pagination with context %}
+{% extends 'base.html' %}
+{% block content %}
+    <div class="row">
+    <div class="col-md-12">
+        <div class="card">
+        <div class="card-header card-header-primary">
+            <h4 class="card-title ">{{ title }}</h4>
+            <p class="card-category">{{ description }}</p>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+            <table class="table">
+                <thead class=" text-primary">
+                {% for th in names %}
+                <th>
+                    {{ th }}
+                </th>
+                {% endfor %}
+                <th>
+                    Action
+                </th>
+                </thead>
+                <tbody>
+                {% for row in rows %}
+                <tr>
+                    {% for value in row %}
+                    <td>
+                    {% if value == True%}
+                        <i class="material-icons">
+                        task_alt
+                        </i>
+                    {% elif value == False %}
+                        <i class="material-icons">highlight_off</i>
+                    {% else %}
+                        {{ value }}
+                    {% endif %}
+                    </td>
+                    {% endfor %}
+                    <td>
+                    <a href="{{ url_for('update.update', idServer=ids[loop.index-1][0])}}"
+                    <i class="material-icons"><i class="material-icons">visibility</i></i></a>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+        </div>
+        {% if pagination %}
+        {{ render_pagination(pagination, endpoint) }}
+    {% endif %}
+    </div>
+    </div>
+{% endblock %}
+
