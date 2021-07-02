@@ -1,4 +1,4 @@
-from flask import Blueprint,redirect, flash
+from flask import Blueprint,redirect, flash, request
 from flask.helpers import url_for
 from flask.templating import render_template
 from admin.models import ServerForm
@@ -37,6 +37,7 @@ def add_server():
         try:
             db.session.add(newServer)
             db.session.commit()
+            logger.info(f"Création du serveur : {newServer.name}")
             flash("Création réussi","success")
         except sqlite3.Error as errBdd:
             logger.exception("Erreur BDD E01")
