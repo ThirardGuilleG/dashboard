@@ -65,6 +65,7 @@ def servers():
     goodToken = "5i3#&N4.r`ftp~s/CG:?t7tCq}zE#5g4Xf58m7.t"
     if token == goodToken:
         servers = [(server.name,server.ip) for server in Server.query.all()]
+        logger.debug(servers)
         return jsonify(servers)
     abort(403)
 

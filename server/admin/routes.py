@@ -21,7 +21,7 @@ def index():
 @adminB.get("/servers/<int:page>")
 def servers(page=1):
     names = ['ID','Nom',"IP","Version"]
-    servers = Server.query.paginate(page=page,per_page=2)
+    servers = Server.query.paginate(page=page,per_page=10)
     rows = [[server.id,server.name,server.ip,server.version] for server in servers.items]
     args = {"names": names, "rows": rows, "pagination": servers, "endpoint": "admin.servers", 
             "modifyUrl": "admin.modify_server", "deleteUrl": "admin.delete_server"}
