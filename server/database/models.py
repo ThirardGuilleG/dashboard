@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from datetime import datetime
 import enum
 db = SQLAlchemy()
 
@@ -11,7 +12,8 @@ class UpdateAssociation(db.Model):
     idServer = db.Column(db.Integer, db.ForeignKey('server.id'), primary_key=True)
     done = db.Column(db.Boolean)
     installed = db.Column(db.Boolean)
-    rebootrequired = db.Column(db.Boolean)
+    downloaded = db.Column(db.Boolean)
+    rebootrequired = db.Column(db.Boolean, default=False)
     date = db.Column(db.DateTime)
     server = db.relationship("Server", back_populates="updates")
     update = db.relationship("Update", back_populates="servers")
@@ -19,10 +21,12 @@ class UpdateAssociation(db.Model):
 
 class Update(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    kb = db.Column(db.String(15), unique=True)
     title = db.Column(db.String(250), nullable=False, unique=True)
-    maxSize = db.Column(db.Integer)
-    date = db.Column(db.DateTime())
-    url = db.Column(db.String(100))
+    description = db.Column(db.String(350))
+    size = db.Column(db.String(15))
+    date = db.Column(db.DateTime(), default=datetime.now())
+    infoUrl = db.Column(db.String(250))
     servers = db.relationship("UpdateAssociation", back_populates="update")
 
 
@@ -32,6 +36,7 @@ class Server(db.Model):
     ip = db.Column(db.String(16), unique=True, nullable=False)
     version = db.Column(db.String(50))
     description = db.Column(db.String(250))
+    rebootrequired = db.Column(db.Boolean, default=False)
     updates = db.relationship("UpdateAssociation", back_populates="server")
 
 
