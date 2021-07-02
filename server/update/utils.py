@@ -1,2 +1,8 @@
-from database.models import Update,updates
+from database.models import Update
 
+def addUpdates():
+    pass
+
+
+def doneUpdates():
+    pass
