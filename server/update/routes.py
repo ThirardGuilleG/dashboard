@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify, render_template
 from datetime import datetime
 import json, re
 from flask_sqlalchemy import Pagination
-from sqlalchemy import and_
+from sqlalchemy import and_, or_
 from loguru import logger
 from database.models import Server, Update, get_db, UpdateAssociation
 
@@ -17,34 +17,42 @@ def data():
     """
     answer = request.get_data(as_text=True).encode('utf-8')
     resp = json.loads(answer.decode())
+    # TODO Fonction
     if resp:
-        for update in resp:
-            nameUpdate = update.get('Title')
-            server = update.get('PSComputerName')
-            maxSize = update.get('MaxDownloadSize')
-            url = update.get('SupportUrl')
+        for update in resp.get('updates'):
+            logger.debug(update)
+            logger.debug(resp.get('needRestart'))
+            title = update.get('Title')
+            description = update.get('Description')
+            server = update.get('ComputerName')
+            size = update.get('Size')
+            kb = update.get('KB')
+            status = update.get('Status')
             reboot = update.get('RebootRequired')
             installed = update.get('IsInstalled')
-            time = update.get('LastDeploymentChangeTime')
-            timestamp = int(re.search(r'\d+', time[0:16]).group())
-            date = datetime.fromtimestamp(timestamp)
+            downloaded = update.get('IsDownloaded')
+            url = update.get('MoreInfoUrls')
             logger.info(f'Mise à jour récupérée pour : {server}')
             # Server
             myServer = Server.query.filter_by(name=server).first()
             if not myServer:
                 logger.warning("le serveur n'est pas en bdd")
                 return jsonify("erreur",200)
-            myUpdate = Update.query.filter_by(title=nameUpdate).first()
+            myUpdate = Update.query.filter(or_(Update.kb==kb,Update.title==title)).first()
+
+            # Création de la MAJ si elle existe pas
             if not myUpdate:
-                # Création de la MAJ 
-                logger.debug(f"Création de la MAJ : {nameUpdate}")
-                newUpdate = Update(title=nameUpdate,maxSize=maxSize,date=date,url=url)
+                logger.debug(f"Création de la MAJ : {kb}")
+                newUpdate = Update(kb=kb,title=title,date=datetime.now(),size=size,infoUrl=url,description=description)
                 myUpdate = newUpdate
+
             modifyinformation = UpdateAssociation.query.filter_by(idUpdate=myUpdate.id,idServer=myServer.id).first()
+            # Regarde la chaine so
             if modifyinformation:
                 # mise à jour des informations
                 logger.debug(f"L'association entre la MAJ {modifyinformation} existe déjà modification des informations")
                 modifyinformation.installed = installed
+                modifyinformation.downloaded = downloaded
                 modifyinformation.rebootRequired = reboot
                 modifyinformation.date = datetime.now()
                 db.session.add(modifyinformation)
@@ -52,7 +60,8 @@ def data():
                 logger.debug(f"Création de l'association pour la MAJ {myUpdate} et server : {server}")
                 with db.session.no_autoflush:
                     # Création de l'association
-                    association = UpdateAssociation(done=False,installed=installed, rebootrequired=reboot,date=datetime.now()) # ajout des données en plus
+                    # ajout des données en plus
+                    association = UpdateAssociation(done=False,downloaded=downloaded, rebootrequired=reboot,date=datetime.now(), installed=installed) 
                     # Ajout du server relié à l'update
                     db.session.no_autoflush
                     association.update = myUpdate
@@ -62,7 +71,7 @@ def data():
                     myServer.updates.append(association)
                     db.session.add(myServer)
             db.session.commit()
-        return jsonify("ok", 200)
+        return jsonify("ok", 201)
 
 
 @updateB.route('/<int:idServer>')
