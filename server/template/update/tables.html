@@ -10,7 +10,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-            <table class="table">
+            <table class="table table-striped table-bordered" id="last" style="width:100%">
                 <thead class=" text-primary">
                 {% for th in names %}
                 <th>
@@ -54,4 +54,15 @@
     </div>
     </div>
 {% endblock %}
+
+{% block script %}
+{{super()}}
+<script>
+$(document).ready(function() {
+    $('#last').DataTable();
+    $('.dataTables_filter').addClass('pull-right');
+    $('.dataTables_filter').css('padding-right','4px');
+} );
+</script>
+{% endblock script %}
 
