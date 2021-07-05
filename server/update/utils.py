@@ -1,4 +1,3 @@
-from typing import Tuple
 from database.models import Update,Server,UpdateAssociation, get_db
 from sqlalchemy import and_, or_
 from datetime import datetime
@@ -16,51 +15,80 @@ class Etat(enum.Enum):
 
 
 def doneUpdates(history_updates: list):
+    """Passe une mise à jours à done si elle est trouvée dans l'historique des mise à jours
+
+    Args:
+        history_updates (list): liste contenant l'historique des mise à jours sur 5 jours
+    """
     logger.info("check des mise à jours pour :")
-    for update in history_updates:
-        server = update.get('ComputerName')
-        kb = update.get('KB')
-        title = update.get('Title')
-        date = datetime.fromtimestamp(int(update.get('Date')[6:16]))
-        result = Etat[update.get('Result').strip()]
-        if result.value is True:
-            s = Server.query.filter_by(name=server).first()
-            update = Update.query.filter(or_(Update.kb==kb,Update.title==title)).first()
-            if update:
-                uptade_to_valid = UpdateAssociation.query.filter(and_(UpdateAssociation.idUpdate==update.id,
-                                                                UpdateAssociation.idServer==s.id), UpdateAssociation.done==False).first()
-                # Update des informations
-                if uptade_to_valid:
-                    logger.info(f"La mise à jours : {uptade_to_valid.idUpdate} est ok pour : {server}")
-                    uptade_to_valid.done=True
-                    uptade_to_valid.date=date
-                    uptade_to_valid.installed=True
-                    uptade_to_valid.downloaded=True
-                    uptade_to_valid.rebootrequired=False
-                    db.session.add(uptade_to_valid)
-                    db.session.commit()
+    try:
+        for update in history_updates:
+            server = update.get('ComputerName')
+            kb = update.get('KB')
+            title = update.get('Title')
+            date = datetime.fromtimestamp(int(update.get('Date')[6:16]))
+            result = Etat[update.get('Result').strip()]
+            if result.value is True:
+                s = Server.query.filter_by(name=server).first()
+                update = Update.query.filter(or_(Update.kb==kb,Update.title==title)).first()
+                if update:
+                    uptade_to_valid = UpdateAssociation.query.filter(and_(UpdateAssociation.idUpdate==update.id,
+                                                                    UpdateAssociation.idServer==s.id), UpdateAssociation.done==False).first()
+                    # Update des informations
+                    if uptade_to_valid:
+                        logger.info(f"La mise à jours : {uptade_to_valid.idUpdate} est ok pour : {server}")
+                        uptade_to_valid.done=True
+                        uptade_to_valid.date=date
+                        uptade_to_valid.installed=True
+                        uptade_to_valid.downloaded=True
+                        uptade_to_valid.rebootrequired=False
+                        db.session.add(uptade_to_valid)
+                        db.session.commit()
+    except Exception as err:
+        logger.exception(err)
+
+
+class Response(enum.Enum):
+    success = ("success", 201)
+    error = ("error", 202)
+    something_wrong = ("Not all data has been handled check logs", 202)
+
 
 
 def addUpdates(pUpdates: list):
-    for update in pUpdates:
-            title = update.get('Title').encode('utf-8')
-            description = update.get('Description').encode('utf-8')
-            server = update.get('ComputerName')
-            size = update.get('Size')
-            kb = update.get('KB')
-            status = update.get('Status')
-            reboot = update.get('RebootRequired')
-            installed = update.get('IsInstalled')
-            downloaded = update.get('IsDownloaded')
-            url = update.get('MoreInfoUrls')
-            deployementDate = datetime.fromtimestamp(int(update.get('LastDeploymentChangeTime')[6:16]))
+    """Ajoute les mise à jours et les associations avec les serveurs
+
+    Args:
+        pUpdates (list): liste de mise à jours pour un serveur
+
+    Returns:
+        tuple: (message,code_http)
+    """
+    try:
+        reponse = Response.success.value
+        for update in pUpdates:
+            logger.debug(update)
+            try:
+                title = update.get('Title').encode('utf-8')
+                description = update.get('Description').encode('utf-8')
+                server = update.get('ComputerName')
+                size = update.get('Size')
+                kb = update.get('KB')
+                reboot = update.get('RebootRequired')
+                installed = update.get('IsInstalled')
+                downloaded = update.get('IsDownloaded')
+                url = update.get('MoreInfoUrls')
+                deployementDate = datetime.fromtimestamp(int(update.get('LastDeploymentChangeTime')[6:16]))
+            except AttributeError as errA:
+                logger.exception(errA)
+                response = Response.something_wrong.value
             logger.debug(deployementDate)
             logger.info(f'Mise à jour récupérée pour : {server}')
             # Server
             myServer = Server.query.filter_by(name=server).first()
             if not myServer:
                 logger.warning("le serveur n'est pas en bdd")
-                return ('error',202)
+                response = Response.something_wrong.value
             myUpdate = Update.query.filter(or_(Update.kb==kb,Update.title==title)).first()
 
             # Création de la MAJ si elle existe pas
@@ -94,5 +122,9 @@ def addUpdates(pUpdates: list):
                     myServer.updates.append(association)
                     db.session.add(myServer)
             db.session.commit()
+        return response
+    except Exception as err:
+        logger.exception(err)
+        return Response.error.value
 
 
