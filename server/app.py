@@ -1,6 +1,6 @@
 from flask import request, jsonify, render_template, abort
 from createApp import app
-from utils import get_or_create_img
+from utils import get_or_create_img, get_number_update
 from loguru import logger
 # import modéle
 from database.models import Server, UpdateAssociation
@@ -33,7 +33,14 @@ def servers():
 @app.get('/server')
 def server_view():
     all_servers = Server.query.all()
-    servers = [ {'id': server.id, 'name': server.name, 'ip': server.ip, 'version': server.version, 'img': get_or_create_img(server.id)} for server in all_servers]
+    servers = [ {'id': server.id, 'name': server.name, 'ip': server.ip, 'version': server.version, 'need_restart': server.rebootrequired,
+                'img': get_or_create_img(server.id), 'update':get_number_update(server.id) } for server in all_servers
+                ]
+    def sort_by_number_update(element):
+        if element.get('update') == 'O':
+            return 0
+        return element.get('update')
+    servers.sort(key=sort_by_number_update, reverse=True)
     return render_template('card.html', servers=servers)
 
 
