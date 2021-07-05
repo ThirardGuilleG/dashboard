@@ -35,8 +35,8 @@ def update(idServer):
     ids = [ (update.idServer,update.idUpdate) for update in updates]
     for row in updates:
         update = row.update
-        rows.append([update.title, update.size, row.rebootrequired, row.installed,update.infoUrl ,update.date, row.date])
-        
+        rows.append([update.title, update.size, row.rebootrequired, row.installed,row.downloaded ,update.infoUrl ,update.date, row.date])
+    logger.debug(rows)
     myServer = Server.query.get_or_404(idServer)
     return render_template('update/view.html', title= f"{myServer.name}",description=f"Voici toutes les mises à jours pour : {myServer.name}", 
             names=names, rows=rows, ids=ids, doneUpdates=doneUpdates)
