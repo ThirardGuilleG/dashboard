@@ -9,9 +9,11 @@ function addRuleForPSUpdate($ServerName){
         Write-Host "création route TCP pour : $($ServerName)"
         New-NetFirewallRule -DisplayName "Allow PSWindowsUpdate TCP" -Direction Inbound -LocalPort 143 -Protocol TCP -Action Allow -Profile Domain -CimSession $session
     }
-    if (-Not (Get-NetFirewallRule -DisplayName "Allow PSWindowsUpdate TCP" -CimSession $session)){
+    if (-Not (Get-NetFirewallRule -DisplayName "Allow PSWindowsUpdate DLL" -CimSession $session)){
         Write-Host "création route DLL pour : $($ServerName)"
         New-NetFirewallRule -DisplayName "Allow PSWindowsUpdate DLL" -Direction Inbound -Program "%SystemRoot%\System32\dllhost.exe" -Action Allow -Profile Domain -CimSession $session
+    }else{
+        Write-Host("test")
     }
 }
 
@@ -46,7 +48,7 @@ function main(){
         $historyUpdate = getHistory($Name,1)
         $toSend = @{'updates'=$result ;
         'history'=$historyUpdate;
-        "needRestart"=$needRestart}
+        "needRestart"=$needRestart; 'server'= $Name}
         $toSend | ConvertTo-Json
         $response = Invoke-RestMethod 'http://127.0.0.1:5000/update/data' -Method 'POST' -Body ($toSend | ConvertTo-Json) -ContentType "application/json";
         $response
