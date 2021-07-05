@@ -1,58 +1,60 @@
-{% extends 'base.html' %}
-{% from "macro/pagination.html" import render_pagination with context %}
-{% block content %}
-    <div class="col">
-        <div class="card">
-            <div class="card-header card-header-tabs card-header-primary">
-                <div class="nav-tabs-navigation">
+{% extends 'base.html' %} {% from "macro/pagination.html" import render_pagination with context %} {% block content %}
+<div class="col">
+    <div class="card">
+        <div class="card-header card-header-tabs card-header-primary">
+            <div class="nav-tabs-navigation">
                 <div class="nav-tabs-wrapper">
                     <span class="nav-tabs-title">{{title}} :</span>
                     <ul class="nav nav-tabs" data-tabs="tabs">
-                    <li class="nav-item">
-                        <a class="nav-link active" href="#profile" data-toggle="tab">
-                        <i class="material-icons">update</i> MAJ
-                        <div class="ripple-container"></div>
-                        <div class="ripple-container"></div></a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#messages" data-toggle="tab">
-                        <i class="material-icons">done_all</i> Fini
-                        <div class="ripple-container"></div>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#settings" data-toggle="tab">
-                        <i class="material-icons">sync_problem</i>  A valider
-                        <div class="ripple-container"></div>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#settings" data-toggle="tab">
-                        <i class="material-icons">timeline</i> Statistique
-                        <div class="ripple-container"></div>
-                        </a>
-                    </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#profile" data-toggle="tab">
+                                <i class="material-icons">update</i> MAJ
+                                <div class="ripple-container"></div>
+                                <div class="ripple-container"></div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#messages" data-toggle="tab">
+                                <i class="material-icons">done_all</i> Fini
+                                <div class="ripple-container"></div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#settings" data-toggle="tab">
+                                <i class="material-icons">sync_problem</i> A valider
+                                <div class="ripple-container"></div>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#settings" data-toggle="tab">
+                                <i class="material-icons">timeline</i> Statistique
+                                <div class="ripple-container"></div>
+                            </a>
+                        </li>
                     </ul>
                 </div>
-                </div>
             </div>
-            <div class="card-body">
-                <div class="tab-content">
+        </div>
+        <div class="card-body">
+            <div class="tab-content">
                 <div class="tab-pane active" id="profile">
                     <table class="table table-hover">
                         <thead class="text-danger">
                             <tr>
-                                <th>
-                                    Titre mise à jour    
+                                <th width="500em">
+                                    Titre mise à jour
                                 </th>
                                 <th>
-                                    Taille Max(Mo)
+                                    Taille
                                 </th>
                                 <th>
-                                    Demande un redémarrage
+                                    Redémarrage
                                 </th>
                                 <th>
                                     Installé
+                                </th>
+                                <th>
+                                    Téléchargé
                                 </th>
                                 <th>
                                     Lien + information
@@ -69,21 +71,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                        {% for row in rows %}
+                            {% for row in rows %}
                             <tr>
-                            {% for value in row %}
+                                {% for value in row %}
                                 <td>
                                     {% if value == True%}
-                                        <i class="material-icons">
+                                    <i class="material-icons">
                                         task_alt
-                                        </i>
-                                    {% elif value == False %}
-                                        <i class="material-icons">highlight_off</i>
-                                    {% else %}
-                                        {{ value }}
-                                    {% endif %}
+                                        </i> {% elif value == False %}
+                                    <i class="material-icons">highlight_off</i> {% else %} {{ value }} {% endif %}
                                 </td>
-                            {% endfor %}
+                                {% endfor %}
                                 <td>
                                     <a href="{{ url_for('update.validate', idServer=ids[loop.index-1][0],idUpdate=ids[loop.index-1][1])}}">
                                     {# <button type="button" class="btn btn-success">Valider</button> #}
@@ -92,7 +90,7 @@
                                     </i></a>
                                 </td>
                             </tr>
-                        {% endfor %}
+                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
@@ -101,7 +99,7 @@
                         <thead class="text-danger">
                             <tr>
                                 <th>
-                                    Titre mise à jour    
+                                    Titre mise à jour
                                 </th>
                                 <th>
                                     KB
@@ -111,92 +109,92 @@
                                 </th>
                             </tr>
                         </thead>
-                    <tbody>
                         <tbody>
-                        {% for row in doneUpdates %}
-                            <tr>
-                            {% for value in row %}
-                                <td>
-                                    {{ value }}
-                                </td>   
-                            {% endfor %}
-                            </tr>
-                        {% endfor %}
-                    </tbody>
+                            <tbody>
+                                {% for row in doneUpdates %}
+                                <tr>
+                                    {% for value in row %}
+                                    <td>
+                                        {{ value }}
+                                    </td>
+                                    {% endfor %}
+                                </tr>
+                                {% endfor %}
+                            </tbody>
                     </table>
                 </div>
                 <div class="tab-pane" id="settings">
                     <table class="table">
-                    <tbody>
-                        <tr>
-                        <td>
-                            <div class="form-check">
-                            <label class="form-check-label">
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <label class="form-check-label">
                                 <input class="form-check-input" type="checkbox" value="">
                                 <span class="form-check-sign">
                                 <span class="check"></span>
                                 </span>
                             </label>
-                            </div>
-                        </td>
-                        <td>Lines From Great Russian Literature? Or E-mails From My Boss?</td>
-                        <td class="td-actions text-right">
-                            <button type="button" rel="tooltip" title="" class="btn btn-primary btn-link btn-sm" data-original-title="Edit Task">
+                                    </div>
+                                </td>
+                                <td>Lines From Great Russian Literature? Or E-mails From My Boss?</td>
+                                <td class="td-actions text-right">
+                                    <button type="button" rel="tooltip" title="" class="btn btn-primary btn-link btn-sm" data-original-title="Edit Task">
                             <i class="material-icons">edit</i>
                             </button>
-                            <button type="button" rel="tooltip" title="" class="btn btn-danger btn-link btn-sm" data-original-title="Remove">
+                                    <button type="button" rel="tooltip" title="" class="btn btn-danger btn-link btn-sm" data-original-title="Remove">
                             <i class="material-icons">close</i>
                             </button>
-                        </td>
-                        </tr>
-                        <tr>
-                        <td>
-                            <div class="form-check">
-                            <label class="form-check-label">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <label class="form-check-label">
                                 <input class="form-check-input" type="checkbox" value="" checked="">
                                 <span class="form-check-sign">
                                 <span class="check"></span>
                                 </span>
                             </label>
-                            </div>
-                        </td>
-                        <td>Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit
-                        </td>
-                        <td class="td-actions text-right">
-                            <button type="button" rel="tooltip" title="" class="btn btn-primary btn-link btn-sm" data-original-title="Edit Task">
+                                    </div>
+                                </td>
+                                <td>Flooded: One year later, assessing what was lost and what was found when a ravaging rain swept through metro Detroit
+                                </td>
+                                <td class="td-actions text-right">
+                                    <button type="button" rel="tooltip" title="" class="btn btn-primary btn-link btn-sm" data-original-title="Edit Task">
                             <i class="material-icons">edit</i>
                             </button>
-                            <button type="button" rel="tooltip" title="" class="btn btn-danger btn-link btn-sm" data-original-title="Remove">
+                                    <button type="button" rel="tooltip" title="" class="btn btn-danger btn-link btn-sm" data-original-title="Remove">
                             <i class="material-icons">close</i>
                             </button>
-                        </td>
-                        </tr>
-                        <tr>
-                        <td>
-                            <div class="form-check">
-                            <label class="form-check-label">
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="form-check">
+                                        <label class="form-check-label">
                                 <input class="form-check-input" type="checkbox" value="" checked="">
                                 <span class="form-check-sign">
                                 <span class="check"></span>
                                 </span>
                             </label>
-                            </div>
-                        </td>
-                        <td>Sign contract for "What are conference organizers afraid of?"</td>
-                        <td class="td-actions text-right">
-                            <button type="button" rel="tooltip" title="" class="btn btn-primary btn-link btn-sm" data-original-title="Edit Task">
+                                    </div>
+                                </td>
+                                <td>Sign contract for "What are conference organizers afraid of?"</td>
+                                <td class="td-actions text-right">
+                                    <button type="button" rel="tooltip" title="" class="btn btn-primary btn-link btn-sm" data-original-title="Edit Task">
                             <i class="material-icons">edit</i>
                             </button>
-                            <button type="button" rel="tooltip" title="" class="btn btn-danger btn-link btn-sm" data-original-title="Remove">
+                                    <button type="button" rel="tooltip" title="" class="btn btn-danger btn-link btn-sm" data-original-title="Remove">
                             <i class="material-icons">close</i>
                             </button>
-                        </td>
-                        </tr>
-                    </tbody>
+                                </td>
+                            </tr>
+                        </tbody>
                     </table>
                 </div>
             </div>
         </div>
     </div>
-    </div>
+</div>
 {% endblock content %}
