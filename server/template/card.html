@@ -5,8 +5,8 @@
             <div class="col-md-4">
                 <div class="card card-profile">
                     <div class="card-avatar">
-                        <a href="javascript:;">
-                        <img class="img" src="{{ url_for('static', filename='img/faces/19.jpg') }}"> {# TODO trouver img (en fonction de l'os ?)#}
+                        <a href="{{ url_for('update.update', idServer=server['id']) }}">
+                        <img class="img" src="{{ server['img'] }}"> {# TODO trouver img (en fonction de l'os ?)#}
                         </a>
                     </div>
                     <div class="card-body">
