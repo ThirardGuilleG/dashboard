@@ -1,51 +1,9 @@
-from flask import Flask, request, jsonify, render_template, abort, flash
-from flask_bootstrap import Bootstrap
-from flask_migrate import Migrate
-from flask_login import LoginManager
-from database.models import User
-import json
-import re, base64
-
+from flask import request, jsonify, render_template, abort
+from createApp import app
+from utils import get_or_create_img
 from loguru import logger
 # import modéle
-from database.models import db, Server
-
-# import routes
-from update.routes import updateB
-from admin.routes import adminB
-from auth.routes import authB
-
-# app config
-from createApp import app
-Bootstrap(app)
-
-# Blueprint
-app.register_blueprint(updateB)
-app.register_blueprint(adminB)
-app.register_blueprint(authB)
-
-# Database
-db.app = app
-db.init_app(app)
-db.create_all()
-
-# Migration de bdd (update et ajout de table)
-migrate = Migrate(app, db)
-
-# connection
-login_manager = LoginManager()
-login_manager.login_view = 'auth.login'
-login_manager.login_message_category = "info"
-login_manager.login_message  = "Veuillez vous connecter"
-login_manager.init_app(app)
-
-
-@login_manager.user_loader
-def load_user(user_id):
-    """Check if user is logged-in on every page load."""
-    if user_id is not None:
-        return User.query.get(user_id)
-    return None
+from database.models import Server, UpdateAssociation
 
 
 @app.route("/", methods=['GET', 'POST'])
@@ -55,7 +13,9 @@ def index():
 
 @app.route("/dashboard", methods=['GET', 'POST'])
 def dashboard():
-    return render_template('dashboard.html')
+    updates = UpdateAssociation.query.filter(UpdateAssociation.done==False).all()
+    done_updates = UpdateAssociation.query.filter(UpdateAssociation.done==True).all()
+    return render_template('dashboard.html', number_update=len(updates), done_updates=len(done_updates))
 
 
 @app.post('/servers')
@@ -73,9 +33,7 @@ def servers():
 @app.get('/server')
 def server_view():
     all_servers = Server.query.all()
-    servers = [ {'id': server.id, 'name': server.name, 'ip': server.ip, 'version': server.version } for server in all_servers]
-    logger.debug(servers)
-    flash('Hello',"info")
+    servers = [ {'id': server.id, 'name': server.name, 'ip': server.ip, 'version': server.version, 'img': get_or_create_img(server.id)} for server in all_servers]
     return render_template('card.html', servers=servers)
 
 
