@@ -7,6 +7,9 @@ db = SQLAlchemy()
 
 
 class UpdateAssociation(db.Model):
+    """ Table qui gère l'association entre une update et un serveur.
+    Gère également l'état de l'update (téléchargé/installé/fini)
+    """
     __tablename__ = "UpdateAssociation"
     idUpdate = db.Column(db.Integer, db.ForeignKey('update.id'), primary_key=True)
     idServer = db.Column(db.Integer, db.ForeignKey('server.id'), primary_key=True)
@@ -20,6 +23,9 @@ class UpdateAssociation(db.Model):
 
 
 class Update(db.Model):
+    """
+    Table qui gère les différentes mise à jours.
+    """
     id = db.Column(db.Integer, primary_key=True)
     kb = db.Column(db.String(15), unique=True)
     title = db.Column(db.String(250), nullable=False, unique=True)
@@ -31,6 +37,10 @@ class Update(db.Model):
 
 
 class Server(db.Model):
+    """
+    Table de gestion des serveurs.
+    TODO Récupérer dans l'ad ?
+    """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(75), unique=True, nullable=False)
     ip = db.Column(db.String(16), unique=True, nullable=False)
@@ -41,6 +51,9 @@ class Server(db.Model):
 
 
 class UserType(enum.Enum):
+    """
+    Pas utilisé et temporaire 
+    """
     admin = 1
     update = 2
     server = 3
@@ -48,9 +61,10 @@ class UserType(enum.Enum):
 
 
 class User(db.Model, UserMixin):
-    id = db.Column(db.Integer, 
-        primary_key=True
-        )
+    """
+    Table de gestions des utilisateurs. Egalement utilise par flask_login pour la connection utilisateur.
+    """
+    id = db.Column(db.Integer, primary_key=True)
     firstname = db.Column(db.String(75))
     lastname = db.Column(db.String(75))
     username = db.Column(db.String(75), unique=True, nullable=False)
@@ -72,4 +86,7 @@ class User(db.Model, UserMixin):
 
 
 def get_db() -> SQLAlchemy:
+    """
+        obtention de l'objet db
+    """
     return db
