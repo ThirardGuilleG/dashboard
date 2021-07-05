@@ -4,6 +4,7 @@ function addRuleForPSUpdate($ServerName){
     # TODO ajouter la régle si existe pas
     Write-Host "création route pour : $($ServerName)"
     $session = New-CimSession -ComputerName $ServerName
+    # Get-NetFirewallRule -DisplayName <String[]>
     New-NetFirewallRule -DisplayName "Allow PSWindowsUpdate TCP" -Direction Inbound -LocalPort 143 -Protocol TCP -Action Allow -Profile Domain -CimSession $session
     New-NetFirewallRule -DisplayName "Allow PSWindowsUpdate DLL" -Direction Inbound -Program "%SystemRoot%\System32\dllhost.exe" -Action Allow -Profile Domain -CimSession $session
 }
@@ -31,7 +32,7 @@ function main(){
     
     foreach($server in (getServers | ConvertFrom-Json)){
         $Name,$ip = $server.value
-        addRuleForPSUpdate($Name)
+        # addRuleForPSUpdate($Name)
         Write-Host("Fetch update pour $($Name) ip : $($ip)")
         $result = betterFetchUpdates($Name)
         $needRestart = Get-WURebootStatus -ComputerName $Name -Silent
