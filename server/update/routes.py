@@ -17,10 +17,17 @@ def data():
     """
     answer = request.get_data(as_text=True).encode('utf-8')
     resp = json.loads(answer.decode())
-    # TODO Fonction
     if resp:
         statut = addUpdates(resp.get('updates'))
         doneUpdates(resp.get('history'))
+        need_restart = resp.get('needRestart')
+        server = resp.get('server')
+        queryServer = Server.query.filter_by(name=server).first()
+        if queryServer:
+            logger.debug(f'Update etat du serveur {server}')
+            queryServer.rebootrequired = need_restart
+            db.session.add(queryServer)
+            db.session.commit()
         return jsonify(statut)
 
 
