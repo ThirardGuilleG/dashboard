@@ -80,62 +80,61 @@ def addUpdates(pUpdates: list):
             if not (isinstance(pUpdates, list)):
                 pUpdates = [pUpdates]
                 logger.debug(f'new data : {pUpdates}')
-                for update in pUpdates:
-                    try:
-                        title = update.get('Title').encode('utf-8')
-                        description = update.get('Description').encode('utf-8')
-                        server = update.get('ComputerName')
-                        size = update.get('Size')
-                        kb = update.get('KB')
-                        reboot = update.get('RebootRequired')
-                        installed = update.get('IsInstalled')
-                        downloaded = update.get('IsDownloaded')
-                        url = update.get('MoreInfoUrls')
-                        deployementDate = datetime.fromtimestamp(int(update.get('LastDeploymentChangeTime')[6:16]))
-                        logger.debug(deployementDate)
-                        logger.info(f'Mise à jour récupérée pour : {server}')
-                    except AttributeError as errA:
-                        logger.exception(errA)
-                        return Response.something_wrong.value
-                    # Server
-                    myServer = Server.query.filter_by(name=server).first()
-                    if not myServer:
-                        logger.warning("le serveur n'est pas en bdd")
-                        return Response.something_wrong.value
-                    myUpdate = Update.query.filter(or_(Update.kb==kb,Update.title==title)).first()
+            for update in pUpdates:
+                try:
+                    title = update.get('Title').encode('utf-8')
+                    description = update.get('Description').encode('utf-8')
+                    server = update.get('ComputerName')
+                    size = update.get('Size')
+                    kb = update.get('KB')
+                    reboot = update.get('RebootRequired')
+                    installed = update.get('IsInstalled')
+                    downloaded = update.get('IsDownloaded')
+                    url = update.get('MoreInfoUrls')
+                    deployementDate = datetime.fromtimestamp(int(update.get('LastDeploymentChangeTime')[6:16]))
+                    logger.debug(deployementDate)
+                    logger.info(f'Mise à jour récupérée pour : {server}')
+                except AttributeError as errA:
+                    logger.exception(errA)
+                    return Response.something_wrong.value
+                # Server
+                myServer = Server.query.filter_by(name=server).first()
+                if not myServer:
+                    logger.warning("le serveur n'est pas en bdd")
+                    return Response.something_wrong.value
+                myUpdate = Update.query.filter(or_(Update.kb==kb,Update.title==title)).first()
+                logger.debug(myUpdate)
+                # Création de la MAJ si elle existe pas
+                if not myUpdate:
+                    logger.debug(f"Création de la MAJ : {kb}")
+                    newUpdate = Update(kb=kb,title=title,date=deployementDate,size=size,infoUrl=url,description=description)
+                    myUpdate = newUpdate
 
-                    # Création de la MAJ si elle existe pas
-                    if not myUpdate:
-                        logger.debug(f"Création de la MAJ : {kb}")
-                        newUpdate = Update(kb=kb,title=title,date=deployementDate,size=size,infoUrl=url,description=description)
-                        myUpdate = newUpdate
-
-                    modifyinformation = UpdateAssociation.query.filter_by(idUpdate=myUpdate.id,idServer=myServer.id).first()
-                    # Regarde la chaine so
-                    if modifyinformation:
-                        # mise à jour des informations
-                        logger.debug(f"L'association entre la MAJ {modifyinformation} existe déjà modification des informations")
-                        modifyinformation.installed = installed
-                        modifyinformation.downloaded = downloaded
-                        modifyinformation.rebootRequired = reboot
-                        modifyinformation.date = datetime.now()
-                        db.session.add(modifyinformation)
-                    else:
-                        logger.debug(f"Création de l'association pour la MAJ {myUpdate} et server : {server}")
-                        with db.session.no_autoflush:
-                            # Création de l'association
-                            # ajout des données en plus
-                            association = UpdateAssociation(done=False,downloaded=downloaded, rebootrequired=reboot,date=datetime.now(), installed=installed) 
-                            # Ajout du server relié à l'update
-                            db.session.no_autoflush
-                            association.update = myUpdate
-                            # ajout en bdd
-                            myServer.updates.append(association)
-                            db.session.add(myServer)
-                    db.session.commit()
-                return response
+                modifyinformation = UpdateAssociation.query.filter_by(idUpdate=myUpdate.id,idServer=myServer.id).first()
+                # Regarde la chaine so
+                if modifyinformation:
+                    # mise à jour des informations
+                    logger.debug(f"L'association entre la MAJ {modifyinformation} existe déjà modification des informations")
+                    modifyinformation.installed = installed
+                    modifyinformation.downloaded = downloaded
+                    modifyinformation.rebootRequired = reboot
+                    modifyinformation.date = datetime.now()
+                    db.session.add(modifyinformation)
+                else:
+                    logger.debug(f"Création de l'association pour la MAJ {myUpdate} et server : {server}")
+                    with db.session.no_autoflush:
+                        # Création de l'association
+                        # ajout des données en plus
+                        association = UpdateAssociation(done=False,downloaded=downloaded, rebootrequired=reboot,date=datetime.now(), installed=installed) 
+                        # Ajout du server relié à l'update
+                        db.session.no_autoflush
+                        association.update = myUpdate
+                        # ajout en bdd
+                        myServer.updates.append(association)
+                        db.session.add(myServer)
+                db.session.commit()
+            return response
     except Exception as err:
         logger.exception(err)
         return Response.error.value
-
 
