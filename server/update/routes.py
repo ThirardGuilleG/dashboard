@@ -1,7 +1,8 @@
-from flask import Blueprint, request, jsonify, render_template
+from flask import Blueprint, request, jsonify, render_template, flash, url_for
 import json
 from sqlalchemy import and_
 from loguru import logger
+from werkzeug.utils import redirect
 from database.models import Server, Update, get_db, UpdateAssociation
 from update.utils import addUpdates, doneUpdates
 
@@ -61,7 +62,17 @@ def last_update(page):
 
 @updateB.route('/validate/<int:idServer>/<int:idUpdate>')
 def validate(idUpdate,idServer):
-    return "Not implemented"
+    valide_update = UpdateAssociation.query.filter_by(and_(idUpdate=idUpdate,idServer=idServer)).first()
+    if valide_update:
+        valide_update.done = True
+        valide_update.downloaded = True
+        valide_update.installed = True
+        db.session.add(valide_update)
+        db.session.commit()
+        flash("Validation réussie", "success")
+        return redirect(url_for('update.update', idServer=idServer))
+    flash("erreur dans la validation", "error")
+    return redirect(url_for('update.update', idServer=idServer))
 
 
 @updateB.route("/test", methods=['GET', 'POST'])
