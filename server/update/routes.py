@@ -17,7 +17,7 @@ def data():
     Ajout des mise à jours en base de données
     """
     answer = request.get_data(as_text=True).encode('utf-8')
-    resp = json.loads(answer.decode())
+    resp = json.loads(answer)
     if resp:
         statut = addUpdates(resp.get('updates'))
         doneUpdates(resp.get('history'))
