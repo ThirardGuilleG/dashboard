@@ -62,7 +62,7 @@ def last_update(page):
 
 @updateB.route('/validate/<int:idServer>/<int:idUpdate>')
 def validate(idUpdate,idServer):
-    valide_update = UpdateAssociation.query.filter_by(and_(idUpdate=idUpdate,idServer=idServer)).first()
+    valide_update = UpdateAssociation.query.filter(and_(UpdateAssociation.idUpdate==idUpdate,UpdateAssociation.idServer==idServer)).first()
     if valide_update:
         valide_update.done = True
         valide_update.downloaded = True

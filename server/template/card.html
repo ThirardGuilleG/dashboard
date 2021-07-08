@@ -5,7 +5,7 @@
         <div class="card card-profile bg-ligth">
             <div class="card-avatar ">
                 <a href="{{ url_for('update.update', idServer=server['id']) }}">
-                    <img class="img" src="{{ server['img'] }}"> {# TODO trouver img (en fonction de l'os ?)#}
+                    <img class="img" src="{{ server['img'] }}">
                 </a>
             </div>
             {% if server['need_restart'] == True %}
