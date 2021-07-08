@@ -48,6 +48,7 @@ class Server(db.Model):
     description = db.Column(db.String(250))
     rebootrequired = db.Column(db.Boolean, default=False)
     updates = db.relationship("UpdateAssociation", back_populates="server")
+    bind_etat = db.relationship("Etat_Service", backref="etat", uselist=False)
 
 
 class UserType(enum.Enum):
@@ -83,6 +84,16 @@ class User(db.Model, UserMixin):
     
     def check_password(self, password):
         return check_password_hash(self.password,password)
+
+
+class Etat_Service(db.Model):
+    __tablename__ = 'Etat Service'
+    id = db.Column(db.Integer, primary_key=True)
+    zabbix = db.Column(db.Boolean, default=False)
+    graylog_sidecar = db.Column(db.Boolean, default=False)
+    winlogbeat = db.Column(db.Boolean, default=False)
+    last_update_date = db.Column(db.DateTime, default=datetime.now())
+    id_server = db.Column(db.Integer, db.ForeignKey('server.id'))
 
 
 def get_db() -> SQLAlchemy:
