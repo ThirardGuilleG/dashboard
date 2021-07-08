@@ -1,6 +1,14 @@
 ."$PSScriptRoot\check_services.ps1"
 ."$PSScriptRoot\checkUpdate.ps1"
 
+enum Server_Version{
+    WindowsServer19 = 19
+    WindowsServer16 = 16
+    WindowsServer12 = 12
+    WindowsServer12R2 = 12.2
+    WindowsServer08R2 = 08
+}
+
 
 function getServers(){
     $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
@@ -22,18 +30,18 @@ function main(){
         # $needRestart = Get-WURebootStatus -ComputerName $Name -Silent
         # Récupération Historique MAJ.
         # $historyUpdate = getHistory($Name,1)
-        # Etat des services
-        $graylog = checkGraylog $Name
-        $zabbix = checkZabbix $Name
-        Write-Host "Etat graylog : $graylog"
-        Write-Host "Etat zabbix : $zabbix"
+        
         # Objet à envoyer au serveur
         $toSend = @{'updates'=$result ;
         'history'=$historyUpdate;
         "needRestart"=$needRestart; 'server'= $Name}
-        # $toSend | ConvertTo-Json
         # $response = Invoke-RestMethod 'http://127.0.0.1:5000/update/data' -Method 'POST' -Body ($toSend | ConvertTo-Json) -ContentType "application/json";
         # $response
+        # Etat des services
+        $etat = launch_check $Name
+        $dataToSend = @{'server'=$Name; 'etat'=$etat}
+        $response = Invoke-RestMethod 'http://127.0.0.1:5000/admin/data' -Method 'POST' -Body ($dataToSend | ConvertTo-Json) -ContentType "application/json";
+        $response
     }
 }
 
