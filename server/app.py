@@ -22,6 +22,7 @@ def dashboard():
 def servers():
     args= request.form
     token = args.get('token')
+    logger.info(f"Demande de la liste des serveurs de : {request.remote_addr}")
     goodToken = "5i3#&N4.r`ftp~s/CG:?t7tCq}zE#5g4Xf58m7.t"
     if token == goodToken:
         servers = [(server.name,server.ip) for server in Server.query.all()]
@@ -37,11 +38,21 @@ def server_view():
                 'img': get_or_create_img(server.id), 'update':get_number_update(server.id) } for server in all_servers
                 ]
     def sort_by_number_update(element):
+        if element.get('need_restart') is True:
+            return 9999
         if element.get('update') == 'O':
             return 0
         return element.get('update')
     servers.sort(key=sort_by_number_update, reverse=True)
     return render_template('card.html', servers=servers)
+
+
+@app.get('/test')
+def test():
+    import subprocess
+    completed = subprocess.run(["powershell", "-Command", "mstsc /v:10.33.1.111:3389"], capture_output=True)
+    print(completed)
+    return "sss"
 
 
 if __name__ == "__main__":
