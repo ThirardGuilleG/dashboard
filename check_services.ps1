@@ -36,7 +36,7 @@ function checkGraylog($server_name){
     Graylog sidercar permet d'etre détecté par graylog
     #>
     Write-Host("Check Graylog pour : $server_name")
-    return check_service $server_name "graylog-sidercar"
+    return check_service $server_name "graylog-sidecar"
 }
 
 
@@ -49,17 +49,12 @@ function checkGraylogIsActive($server_name){
 }
 
 
-function test($server, [string]$service){
-    $service
-    Invoke-Command -ComputerName $server -ScriptBlock {
-            Get-Service -Name "$service"
-            if(Get-Service -Name "$service")
-            {
-                return $true
-            }
-            else{
-                return $false
-            }
+function launch_check($server){
+    $result = @{
+        'graylog'=checkGraylog $server;
+        'winlogbeat'=checkGraylogIsActive $server;
+        'zabbix'=checkZabbix $server
         }
+    return $result
 }
 
