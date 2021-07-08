@@ -1,10 +1,12 @@
+from datetime import datetime
 from flask import Blueprint,redirect, flash, request
 from flask.helpers import url_for
 from flask.templating import render_template
 from admin.models import ServerForm
-from database.models import get_db, Server
+from database.models import get_db, Server, Etat_Service
 from loguru import logger
 import sqlite3
+import json
 
 adminB = Blueprint("admin",__name__, url_prefix="/admin")
 
@@ -28,7 +30,7 @@ def servers(page=1):
     return render_template("admin/tables.html", **args)
 
 
-@adminB.route("add/server",methods=['GET','POST'])
+@adminB.route("/add/server",methods=['GET','POST'])
 def add_server():
     form = ServerForm()
     if form.validate_on_submit():
@@ -45,11 +47,41 @@ def add_server():
         return redirect(url_for("admin.servers"))
     return render_template("form.html", form=form, title="Ajout d'un serveur")
 
-@adminB.route("modify/server/<int:idServer>")
+@adminB.route("/modify/server/<int:idServer>")
 def modify_server(idServer):
     return f"Not implemented : modif id : {idServer}"
 
 
-@adminB.route("delete/server/<int:idServer>")
+@adminB.route("/delete/server/<int:idServer>")
 def delete_server(idServer):
     return f"Not implemented : delete id : {idServer}"
+
+
+@adminB.post("/data")
+def data():
+    data = request.get_data(as_text=True).encode('utf-8')
+    resp = json.loads(data)
+    logger.debug(resp)
+    name_server = resp.get('server')
+    etat = resp.get('etat')
+    logger.info(f"Update des etats pour : {name_server}")
+    logger.debug(etat)
+    server = Server.query.filter_by(name=name_server).first()
+    if not server:
+        return "error"
+    etat_server = Etat_Service.query.filter_by(id_server=server.id).first()
+    if etat_server:
+        etat_server.zabbix = etat.get('zabbix')
+        etat_server.graylog_sidecar = etat.get('graylog')
+        etat_server.winlogbeat = etat.get('winlogbeat')
+        etat_server.last_update_date = datetime.now()
+    else:
+        etat_server = Etat_Service()
+        etat_server.zabbix = etat.get('zabbix')
+        etat_server.graylog_sidecar = etat.get('graylog')
+        etat_server.winlogbeat = etat.get('winlogbeat')
+        etat_server.last_update_date = datetime.now()
+        etat_server.id_server = server.id
+    db.session.add(etat_server)
+    db.session.commit()
+    return "OK"
