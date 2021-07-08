@@ -4,7 +4,7 @@ from sqlalchemy import and_
 from loguru import logger
 from werkzeug.utils import redirect
 from database.models import Server, Update, get_db, UpdateAssociation
-from update.utils import addUpdates, doneUpdates
+from Blueprint.update.utils import addUpdates, doneUpdates
 
 
 updateB = Blueprint("update",__name__, url_prefix="/update")

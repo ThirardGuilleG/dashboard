@@ -9,9 +9,9 @@ app.config.from_object(DevConfig)
 
 
 # import routes
-from update.routes import updateB
-from admin.routes import adminB
-from auth.routes import authB
+from Blueprint.update.routes import updateB
+from Blueprint.admin.routes import adminB
+from Blueprint.auth.routes import authB
 
 from database.models import db, User
 

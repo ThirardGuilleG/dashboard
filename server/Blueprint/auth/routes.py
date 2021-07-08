@@ -3,7 +3,7 @@ from flask.templating import render_template
 from werkzeug.utils import redirect
 from database.models import User, UserType, get_db
 from werkzeug.security import generate_password_hash, check_password_hash
-from auth.models import SignUpForm, SignInForm
+from Blueprint.auth.models import SignUpForm, SignInForm
 from loguru import logger
 from urllib.parse import urlparse, urljoin
 from flask_login import login_required, logout_user, login_user
