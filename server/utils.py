@@ -4,7 +4,7 @@ from database.models import UpdateAssociation
 from pathlib import Path
 from loguru import logger
 from sqlalchemy import and_
-
+import os
 # https://dummyimage.com/ api de création d'img
 
 
@@ -23,8 +23,9 @@ def get_img(text: str, name_file: str, width: int = 400, text_color:str = "00000
     """
     url = f"https://dummyimage.com/{ width }/{background_color }/{ text_color }&text={ text }"
     response = requests.get(url)
+    path = os.path.abspath(os.getcwd())
     try:
-        with open(f"server/static/img/number/{name_file}", "wb") as file:
+        with open(f"{path}/static/img/number/{name_file}", "wb") as file:
             file.write(response.content)
         return True
     except OSError as errO:
@@ -57,7 +58,9 @@ def get_or_create_img(idServer: int):
     number = get_number_update(idServer)
     logger.debug(f"{number} MAJ pour id server :{idServer}")
     filename = f"{number}.png"
-    path = f"server/static/img/number/{filename}"
+    current_path = os.path.abspath(os.getcwd())
+    logger.debug(current_path)
+    path = f"{current_path}/static/img/number/{filename}"
     if not Path(path).is_file():
         logger.debug(f"Creation img pour : {idServer}")
         if not get_img(text=str(number), name_file=filename):
