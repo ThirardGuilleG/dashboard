@@ -74,12 +74,18 @@ def data():
         etat_server.zabbix = etat.get('zabbix')
         etat_server.graylog_sidecar = etat.get('graylog')
         etat_server.winlogbeat = etat.get('winlogbeat')
+        etat_server.eaton = etat.get('eaton')
+        etat_server.fsecure = etat.get('fsecure')
+        etat_server.fsecure_activate = etat.get('fsecure_activate')
         etat_server.last_update_date = datetime.now()
     else:
         etat_server = Etat_Service()
         etat_server.zabbix = etat.get('zabbix')
         etat_server.graylog_sidecar = etat.get('graylog')
         etat_server.winlogbeat = etat.get('winlogbeat')
+        etat_server.eaton = etat.get('eaton')
+        etat_server.fsecure = etat.get('fsecure')
+        etat_server.fsecure_activate = etat.get('fsecure_activate')
         etat_server.last_update_date = datetime.now()
         etat_server.id_server = server.id
     db.session.add(etat_server)
