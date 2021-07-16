@@ -92,6 +92,9 @@ class Etat_Service(db.Model):
     zabbix = db.Column(db.Boolean, default=False)
     graylog_sidecar = db.Column(db.Boolean, default=False)
     winlogbeat = db.Column(db.Boolean, default=False)
+    fsecure = db.Column(db.Boolean, default=False)
+    fsecure_activate = db.Column(db.Boolean, default=False)
+    eaton = db.Column(db.Boolean, default=False)
     last_update_date = db.Column(db.DateTime, default=datetime.now())
     id_server = db.Column(db.Integer, db.ForeignKey('server.id'))
 
