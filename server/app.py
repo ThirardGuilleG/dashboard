@@ -1,14 +1,15 @@
-from flask import request, jsonify, render_template, abort
+from flask import request, jsonify, render_template, abort, redirect, url_for
 from createApp import app
 from utils import get_or_create_img, get_number_update
 from loguru import logger
+from waitress import serve
 # import modéle
 from database.models import Server, UpdateAssociation
 
 
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/", methods=['GET'])
 def index():
-    return render_template('base.html')
+    return redirect(url_for('dashboard'))
 
 
 @app.route("/dashboard", methods=['GET', 'POST'])
@@ -56,4 +57,5 @@ def test():
 
 
 if __name__ == "__main__":
-    app.run("0.0.0.0", debug=True)
+    # app.run("0.0.0.0", debug=True)
+    serve(app, host='0.0.0.0', port=5000, threads=8) #WAITRESS!
