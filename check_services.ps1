@@ -49,11 +49,35 @@ function checkGraylogIsActive($server_name){
 }
 
 
+function checkFSecure($server_name){
+    <# Check du service f-secure est présent sur le serveur
+    Anti-Virus
+    #>
+    Write-Host("Check f-secure pour : $server_name")
+    return check_service $server_name "fshoster"
+}
+
+
+function check_fsecure_enable($server_name){
+    Write-Host("Check f-secure activé pour : $server_name")
+    return check_service $server_name "fsulorsp"
+}
+
+
+function check_eaton($server_name){
+    Write-Host("Check Agent Eaton Protector pour : $server_name")
+    return check_service $server_name "Eaton IntelligentPowerProtector"
+}
+
+
 function launch_check($server){
     $result = @{
-        'graylog'=checkGraylog $server;
-        'winlogbeat'=checkGraylogIsActive $server;
-        'zabbix'=checkZabbix $server
+        'graylog'= checkGraylog $server;
+        'winlogbeat'= checkGraylogIsActive $server;
+        'zabbix'= checkZabbix $server;
+        'fsecure'= checkFSecure $server;
+        'fsecure_activate'= check_fsecure_enable $server;
+        'eaton'= check_eaton $server
         }
     return $result
 }
