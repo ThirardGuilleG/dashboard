@@ -23,9 +23,10 @@ def get_img(text: str, name_file: str, width: int = 400, text_color:str = "00000
     """
     url = f"https://dummyimage.com/{ width }/{background_color }/{ text_color }&text={ text }"
     response = requests.get(url)
-    path = os.path.abspath(os.getcwd())
+    path_to_file = Path(__file__).absolute().parent.__str__() + "\\static\\img\\number\\" + name_file
+    logger.debug(path_to_file)
     try:
-        with open(f"{path}/static/img/number/{name_file}", "wb") as file:
+        with open(path_to_file.__str__(), "wb") as file:
             file.write(response.content)
         return True
     except OSError as errO:
@@ -58,9 +59,8 @@ def get_or_create_img(idServer: int):
     number = get_number_update(idServer)
     logger.debug(f"{number} MAJ pour id server :{idServer}")
     filename = f"{number}.png"
-    current_path = os.path.abspath(os.getcwd())
-    logger.debug(current_path)
-    path = f"{current_path}/static/img/number/{filename}"
+    path = Path(__file__).absolute().parent.__str__() + "\\static\\img\\number\\" + filename
+    logger.debug(f'{path=}')
     if not Path(path).is_file():
         logger.debug(f"Creation img pour : {idServer}")
         if not get_img(text=str(number), name_file=filename):
@@ -74,4 +74,4 @@ def get_or_create_img(idServer: int):
 
 if __name__ == "__main__":
     # get_img("12", 400, "000000", "ffffff","12.png")
-    print(get_number_update(2))
+    get_or_create_img(2)
