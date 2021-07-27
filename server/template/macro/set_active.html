@@ -1,0 +1,5 @@
+{% macro nav_item(current_endpoint, link_endpoint) %} {% if current_endpoint== link_endpoint%}
+<li class="nav-item active">
+    {% else %}
+    <li class="nav-item">
+        {% endif %} {% endmacro %}
