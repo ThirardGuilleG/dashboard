@@ -16,22 +16,13 @@ enum Server_Version{
 $logger = [Logger]::new("MonitoBot")
 
 
-# function getServers(){
-#     $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
-#     $headers.Add("Content-Type", "multipart/form-data")
-#     $postParams = @{token=$token}
-#     $response = Invoke-RestMethod -Uri "$server_url/servers" -Method Post -Body $postParams;
-#     return $response | ConvertTo-Json
-# }
-
-
 function check_services(){
     foreach($server in (getServers | ConvertFrom-Json)){
         $Name,$ip = $server.value
         $etat = launch_check $Name
         $services = @{'server'=$Name; 'etat'=$etat}
-        $response = Invoke-RestMethod "$server_url/admin/data" -Method 'POST' -Body ($services | ConvertTo-Json) -ContentType "application/json";
-        Write-Host $response -ForeGroundColor Green
+        $url = "$server_url/admin/data"
+        send_json -url $url -object_to_send $services
     }
 }
 
@@ -53,19 +44,17 @@ function main(){
         $toSend = @{'updates'=$result ;
         'history'=$historyUpdate;
         "needRestart"=$needRestart; 'server'= $Name}
-        $toSend -ForeGroundColor Blue
-        # $logger.info("updates des serveurs")
-        $response = Invoke-RestMethod "$server_url/update/data" -Method 'POST' -Body ($toSend | ConvertTo-Json) -ContentType "application/json";
-        Write-Host $response -ForeGroundColor Green
-        # Etat des services
+        $toSend
+        $url = "$server_url/update/data"
+        send_json -url $url -object_to_send $toSend
         $logger.info("Check des services pour le serveur : $($Name)")
         $etat = launch_check $Name
         $dataToSend = @{'server'=$Name; 'etat'=$etat}
-        $response = Invoke-RestMethod "$server_url/admin/data" -Method 'POST' -Body ($dataToSend | ConvertTo-Json) -ContentType "application/json";
-        Write-Host $response -ForeGroundColor Green
-        $response.StatusCode
+        $url = "$server_url/admin/data"
+        send_json -url $url -object_to_send $dataToSend
+        $logger.success("FIN des vérifications pour : $($Name)")
     }
-    $logger.success("Fin du script")
+    $logger.success("FIN du script")
 }
 
 main
