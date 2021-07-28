@@ -25,10 +25,18 @@ def doneUpdates(history_updates: list):
     """
     
     try:
+        # Correction quand il n'y a qu'une seul maj et donc l'objet envoyée n'est pas une liste
+        if history_updates == {}:
+            logger.info("Aucune donnée recu")
+            return None
+        if not (isinstance(history_updates, list)):
+                history_updates = [history_updates]
+                logger.debug(f'new data : {history_updates}')
         for update in history_updates:
             server = update.get('ComputerName')
             kb = update.get('KB')
             title = update.get('Title')
+            logger.debug(f"{update.get('Date')=}")
             date = datetime.fromtimestamp(int(update.get('Date')[6:16]))
             result = Etat[update.get('Result').strip()]
             logger.debug(f"check des mise à jours pour : {server}")
@@ -82,8 +90,9 @@ def addUpdates(pUpdates: list):
                 logger.debug(f'new data : {pUpdates}')
             for update in pUpdates:
                 try:
-                    title = update.get('Title').encode('utf-8')
-                    description = update.get('Description').encode('utf-8')
+                    title = update.get('Title')
+                    logger.info(title)
+                    description = update.get('Description')
                     server = update.get('ComputerName')
                     size = update.get('Size')
                     kb = update.get('KB')
