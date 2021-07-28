@@ -1,3 +1,7 @@
+$server_url = "http://127.0.0.1:5000"
+$token = '5i3#&N4.r`ftp~s/CG:?t7tCq}zE#5g4Xf58m7.t'
+
+
 function getServers(){
     $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
     $headers.Add("Content-Type", "multipart/form-data")
@@ -5,6 +9,35 @@ function getServers(){
     $response = Invoke-RestMethod -Uri "$server_url/servers" -Method Post -Body $postParams;
     return $response | ConvertTo-Json
 }
+
+
+function send_json{
+    <#
+    .SYNOPSIS
+        Envoi d'une requete POST avec un objet JSON
+    .PARAMETER url
+        url pour le POST
+    .PARAMETER object_to_send
+        Objet powershell qui est converti en objet JSON
+    .EXAMPLE
+        $object = @{msg="An awsome test"}
+        $url = "https://127.0.0.1/post"
+        send_json($url, $object)
+    #>
+    param(
+        [string]$url,
+        [pscustomobject]$object_to_send
+    )
+    $response = Invoke-WebRequest -Uri $url -Method Post -Body ($object_to_send | ConvertTo-Json);
+    # reponse
+    if($response.StatusCode -lt 300){
+        $logger.success("Envoi réussi")
+    }else{
+        $logger.error("Problème dans l'envoi à $url")
+        Write-Host $response.StatusCode
+    }
+}
+
 
 enum graylog_log_type {
     <#
@@ -89,8 +122,10 @@ class Logger{
         }
         $timestamp = Get-Date -Format o | ForEach-Object { $_ -replace ":", "." }
         Write-Host ("$($timestamp)---$($log_type)---$($msg)")
-        $response = Invoke-RestMethod $this.graylog_url -Method 'POST' -Body ($json | ConvertTo-Json) -ContentType "application/json";
-        Write-Host $response.StatusCode
+        $response = Invoke-WebRequest $this.graylog_url -Method 'POST' -Body ($json | ConvertTo-Json) -ContentType "application/json";
+        if ($response.StatusCode -gt 300){
+            Write-Host("Probléme dans l'envoi des logs") -ForeGroundColor Red
+        }
     }
 
     [void] info([string]$msg){
@@ -154,7 +189,3 @@ class Logger{
     }
 
 }
-
-
-$test = [graylog_log_type]::info
-$test.value__
