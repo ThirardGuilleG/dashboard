@@ -1,0 +1,12 @@
+{% extends 'base.html' %} {% from "macro/card_service.html" import card_service with context %} {% block content %}
+<div class="card card-stats">
+    <div class="card-header card-header-success card-header-icon">
+        <h1 class="card-title text-center"><strong>Etat Serveur {{ server.name }}</strong>
+        </h1>
+    </div>
+</div>
+<div class="row">
+    {{card_service("bug_report", "F-secure installé", services.fsecure)}} {{card_service("bug_report", "F-secure activer", services.fsecure_activate)}} {{card_service("http", "Graylog", services.graylog_sidecar)}} {{card_service("device_hub", "Zabbix", services.zabbix)}}
+    {{card_service("battery_saver", "Eaton", services.eaton)}} {{card_service("beenhere", "Windows", server.active)}}
+</div>
+{% endblock %}
