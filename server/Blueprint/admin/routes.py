@@ -47,6 +47,7 @@ def add_server():
         return redirect(url_for("admin.servers"))
     return render_template("form.html", form=form, title="Ajout d'un serveur")
 
+
 @adminB.route("/modify/server/<int:idServer>")
 def modify_server(idServer):
     return f"Not implemented : modif id : {idServer}"
@@ -90,4 +91,36 @@ def data():
         etat_server.id_server = server.id
     db.session.add(etat_server)
     db.session.commit()
-    return "OK"
+    return "OK", 201
+
+
+@adminB.post('/active')
+def active():
+    """
+        Update de l'etat activé ou non d'un serveur
+    """
+    data = request.get_data(as_text=True).encode('utf-8')
+    resp = json.loads(data)
+    server_name = resp.get('server')
+    etat = resp.get('etat')
+    logger.info(f"Reception de l'etat windows pour : {server_name} etat : {etat}")
+    server = Server.query.filter_by(name=server_name).first_or_404()
+    server.active = etat
+    db.session.add(server)
+    db.session.commit()
+    return ("success", 201)
+
+
+@adminB.get("/server_view/<int:idServer>")
+def server_view(idServer):
+    """View pour l'etat des services d'un serveur.
+
+    Args:
+        idServer (int): id du serveur
+
+    Returns:
+        response: view html
+    """
+    services = Etat_Service.query.filter_by(id_server=idServer).first_or_404()
+    server = Server.query.get_or_404(idServer)
+    return render_template("services.html", services=services, server=server)
