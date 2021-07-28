@@ -1,0 +1,25 @@
+{% macro card_service(icon, name, etat) %}
+<div class="col-lg-3 col-md-6 col-sm-6">
+    <div class="card card-stats">
+        {% if etat == True %}
+        <div class="card-header card-header-success card-header-icon">
+            {% else %}
+            <div class="card-header card-header-danger card-header-icon">
+                {% endif %}
+                <div class="card-icon">
+                    <i class="material-icons">{{ icon }}</i>
+                </div>
+                <p class="card-category">service</p>
+                <h3 class="card-title"><strong>{{ name }}</strong>
+                </h3>
+            </div>
+            <div class="card-footer">
+                <div class="stats">
+                    {% if etat == True %} Oui <i class="material-icons text-success">done_outline</i> {% else %} Non <i class="material-icons text-danger">dangerous</i> {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    {% endmacro %}
