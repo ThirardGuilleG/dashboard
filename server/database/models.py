@@ -39,7 +39,6 @@ class Update(db.Model):
 class Server(db.Model):
     """
     Table de gestion des serveurs.
-    TODO Récupérer dans l'ad ?
     """
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(75), unique=True, nullable=False)
@@ -47,6 +46,7 @@ class Server(db.Model):
     version = db.Column(db.String(50))
     description = db.Column(db.String(250))
     rebootrequired = db.Column(db.Boolean, default=False)
+    active = db.Column(db.Boolean, default=False)
     updates = db.relationship("UpdateAssociation", back_populates="server")
     bind_etat = db.relationship("Etat_Service", backref="etat", uselist=False)
 
