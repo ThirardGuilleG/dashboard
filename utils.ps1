@@ -73,7 +73,7 @@ class Logger{
         #>
         $this.application_name = $application_name
         $this.hostname = "$Env:COMPUTERNAME"
-        $this.graylog_url = "http://graylog.thirard.fr:12222/gelf"
+        $this.graylog_url = "https://graylog.thirard.fr:12222/gelf"
     }
 
     Logger([string]$application_name,
