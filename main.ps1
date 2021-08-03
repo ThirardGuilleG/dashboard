@@ -29,6 +29,7 @@ function check_services(){
 
 function main(){
     $logger.info("Lancement du script d'obtention des updates et des états des services")
+    install_PSWU
     foreach($server in (getServers | ConvertFrom-Json)){
         $Name,$ip = $server.value
         # Ajout de la rèfle pour récupérer les informations si besoin.
@@ -45,12 +46,15 @@ function main(){
         'history'=$historyUpdate;
         "needRestart"=$needRestart; 'server'= $Name}
         $toSend
+        $toSend | ConvertTo-Json -depth 100 | Out-File "$PSScriptRoot\server\test\mock\updates\$Name.json"
         $url = "$server_url/update/data"
         send_json -url $url -object_to_send $toSend
+        # services
         $logger.info("Check des services pour le serveur : $($Name)")
         $etat = launch_check $Name
         $dataToSend = @{'server'=$Name; 'etat'=$etat}
         $url = "$server_url/admin/data"
+        $dataToSend | ConvertTo-Json -depth 100 | Out-File "$PSScriptRoot\server\test\mock\services\$Name.json"
         send_json -url $url -object_to_send $dataToSend
         $logger.success("FIN des vérifications pour : $($Name)")
     }
