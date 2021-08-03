@@ -4,8 +4,8 @@ from utils import get_or_create_img, get_number_update
 from loguru import logger
 from waitress import serve
 # import modéle
-from database.models import Server, UpdateAssociation
-
+from database.models import Server, UpdateAssociation, Etat_Service
+from sqlalchemy import or_
 
 @app.route("/", methods=['GET'])
 def index():
@@ -16,7 +16,16 @@ def index():
 def dashboard():
     updates = UpdateAssociation.query.filter(UpdateAssociation.done==False).all()
     done_updates = UpdateAssociation.query.filter(UpdateAssociation.done==True).all()
-    return render_template('dashboard.html', number_update=len(updates), done_updates=len(done_updates))
+    has_to_restart = [server.id for server in Server.query.filter(Server.rebootrequired==True)]
+    anomalie = Etat_Service.query.filter(or_(
+    Etat_Service.zabbix==False,
+    Etat_Service.graylog_sidecar==False,
+    Etat_Service.winlogbeat==False,
+    Etat_Service.eaton==False,
+    Etat_Service.fsecure==False,
+    Etat_Service.fsecure_activate==False,
+    )).all()
+    return render_template('dashboard.html', number_update=len(updates), done_updates=len(done_updates), nmbr_restart= len(has_to_restart), anomalie=len(anomalie))
 
 
 @app.post('/servers')
