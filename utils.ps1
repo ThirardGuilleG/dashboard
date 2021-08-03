@@ -1,6 +1,7 @@
 $server_url = "http://127.0.0.1:5000"
 $token = '5i3#&N4.r`ftp~s/CG:?t7tCq}zE#5g4Xf58m7.t'
 
+$logger = [Logger]::new("MonitoBot")
 
 function getServers(){
     $headers = New-Object "System.Collections.Generic.Dictionary[[String],[String]]"
@@ -36,6 +37,19 @@ function send_json{
         $logger.error("Problème dans l'envoi à $url")
         Write-Host $response.StatusCode
     }
+}
+
+
+function install_PSWU{
+    <#
+    .SYNOPSIS
+        Installation de PSWindowsUpdate si nécessaire
+    #>
+    $module = Get-Module -ListAvailable -Name PSWindowsUpdate
+    if (-Not $module) {
+        $logger.info("Moduel PSWindowsUpdate n'existe pas on l'install")
+        Install-Module PSWindowsUpdate
+    } 
 }
 
 
