@@ -14,7 +14,7 @@ function addRuleForPSUpdate($ServerName){
 }
 
 function fetch_updates($nameServer){
-    $updates = Get-WindowsUpdate -ComputerName $nameServer 
+    $updates = Get-WindowsUpdate -ComputerName $nameServer
     return $updates | Select-Object Size,Status,ComputerName,KB,Title,Description,Deadline,IsDownloaded,IsInstalled,MoreInfoUrls,RebootRequired,LastDeploymentChangeTime
 }
 
