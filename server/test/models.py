@@ -8,6 +8,7 @@ from config import TestConfig
 class Model(unittest.TestCase):
     def setUp(self):
         app.config.from_object(TestConfig)
+        app.config['WTF_CSRF_ENABLED'] = False
         db.session.close()
         db.drop_all()
         db.create_all()
