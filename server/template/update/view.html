@@ -7,27 +7,21 @@
                     <span class="nav-tabs-title">{{title}} :</span>
                     <ul class="nav nav-tabs" data-tabs="tabs">
                         <li class="nav-item">
-                            <a class="nav-link active" href="#profile" data-toggle="tab">
+                            <a class="nav-link active" href="#update" data-toggle="tab">
                                 <i class="material-icons">update</i> MAJ
                                 <div class="ripple-container"></div>
                                 <div class="ripple-container"></div>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#messages" data-toggle="tab">
+                            <a class="nav-link" href="#update_done" data-toggle="tab">
                                 <i class="material-icons">done_all</i> Fini
                                 <div class="ripple-container"></div>
                             </a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="#settings" data-toggle="tab">
+                            <a class="nav-link" href="#statistique" data-toggle="tab">
                                 <i class="material-icons">sync_problem</i> A valider
-                                <div class="ripple-container"></div>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#settings" data-toggle="tab">
-                                <i class="material-icons">timeline</i> Statistique
                                 <div class="ripple-container"></div>
                             </a>
                         </li>
@@ -37,7 +31,7 @@
         </div>
         <div class="card-body">
             <div class="tab-content">
-                <div class="tab-pane active" id="profile">
+                <div class="tab-pane active" id="update">
                     <table class="table table-hover">
                         <thead class="text-danger">
                             <tr>
@@ -94,7 +88,7 @@
                         </tbody>
                     </table>
                 </div>
-                <div class="tab-pane" id="messages">
+                <div class="tab-pane" id="update_done">
                     <table class="table table-hover">
                         <thead class="text-danger">
                             <tr>
@@ -110,20 +104,19 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tbody>
-                                {% for row in doneUpdates %}
-                                <tr>
-                                    {% for value in row %}
-                                    <td>
-                                        {{ value }}
-                                    </td>
-                                    {% endfor %}
-                                </tr>
+                            {% for row in doneUpdates %}
+                            <tr>
+                                {% for value in row %}
+                                <td>
+                                    {{ value }}
+                                </td>
                                 {% endfor %}
-                            </tbody>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
                     </table>
                 </div>
-                <div class="tab-pane" id="settings">
+                <div class="tab-pane" id="statistique">
                     <table class="table">
                         <tbody>
                             <tr>
