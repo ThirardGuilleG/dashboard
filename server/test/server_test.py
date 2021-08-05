@@ -15,7 +15,7 @@ class TestServer(Model, unittest.TestCase):
         """ Aucune donnée """
         search = Server.query.all()
         logger.debug(f"{search=}")
-        assert search == []
+        self.assertEqual(search, [], "il ne doit y avoir aucune donnée") 
 
     def test_add(self):
         """ ajout d'un serveur"""
@@ -25,8 +25,8 @@ class TestServer(Model, unittest.TestCase):
         all_server = Server.query.all()
         logger.debug(f"{all_server =}")
         logger.debug(all_server[0].active)
-        assert all_server != []
-        assert len(all_server) == 1
+        self.assertNotEqual(all_server, [], "la recherche ne peut pas etre nul")
+        self.assertEqual(len(all_server), 1, "il doit y avoir 1 server en bdd") 
     
     def test_default_state(self):
         """ Valeurs par défaut pour active et rebootrequired doit etre False"""
@@ -34,9 +34,9 @@ class TestServer(Model, unittest.TestCase):
         db.session.add(server_to_add)
         db.session.commit()
         test_server = Server.query.filter_by(name="test").first()
-        assert test_server is not None
-        assert test_server.active is False
-        assert test_server.rebootrequired is False
+        self.assertIsNone(test_server)
+        self.assertFalse(test_server.active)
+        self.assertFalse(test_server.rebootrequired)
 
     def test_failed_unique_constraint(self):
         """ test que le nom et l'ip sont uniques"""
@@ -64,10 +64,8 @@ class TestServer(Model, unittest.TestCase):
         ]
         db.session.add_all(servers)
         db.session.commit()
-        active_servers = Server.query.filter_by(active=True).all()
-        assert len(Server.query.all()) == 4
-        assert active_servers != []
-        assert len(active_servers) == 3
+        self.assertEqual(len(Server.query.all()), 4, "Il doit y avoir 4 serveur en bdd")
+        self.assertEqual(len( Server.query.filter_by(active=True).all()), 3, "il doit y avoir 3 serveur activés")
 
     def test_search_need_reboot(self):
         """ test d'une recherche sur rebootrequired"""
@@ -80,9 +78,9 @@ class TestServer(Model, unittest.TestCase):
         db.session.add_all(servers)
         db.session.commit()
         rebootrequired_servers = Server.query.filter_by(rebootrequired=True).all()
-        assert len(Server.query.all()) == 4
-        assert rebootrequired_servers != []
-        assert len(rebootrequired_servers) == 3
+        self.assertEqual(len(Server.query.all()), 4)
+        self.assertNotEqual(rebootrequired_servers, [])
+        self.assertEqual(len(rebootrequired_servers),3)
 
     def test_version_group(self):
         """ test de query group_by par la version windows"""
@@ -98,9 +96,9 @@ class TestServer(Model, unittest.TestCase):
         db.session.commit()
         search = db.session.query(Server.version, sqlalchemy.func.count(Server.name)).group_by(Server.version).all()
         logger.debug(f"{search=}")
-        assert len(search) == 3
-        assert search[0] == ('12', 2)
-        assert search[1] == ('16', 1)
-        assert search[2] == ('19', 3)
+        self.assertEqual(len(search), 3)
+        self.assertEqual(search[0], ('12', 2))
+        self.assertEqual(search[1], ('16', 1))
+        self.assertEqual(search[2], ('19', 3))
 
 

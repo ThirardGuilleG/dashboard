@@ -12,20 +12,22 @@ class TestUpdates(Model, unittest.TestCase):
     """
 
     def test_lookup(self):
+        """ test si aucune donnée de base"""
         updates = Update.query.all()
-        assert len(updates) == 0
-        print("NUMBER OF ENTRIES:")
-        print(len(updates))
+        self.assertEqual(len(updates), 0, "aucune donnée de base ne doit exister")
     
     def test_add(self):
+        """ test l'ajout d'une MAJ """
         update = Update(kb="kb0514335", title="test update", description="an awsome test description", size="150kb", date=datetime.now(), infoUrl="http://test.fr")
         db.session.add(update)
         db.session.commit()
         logger.debug("records :")
         logger.debug(Update.query.all())
-        assert Update.query.all() is not None
+        self.assertIsNotNone(Update.query.all())
+        self.assertEqual(len(Update.query.all()), 1, "il doit exister une MAJ en bdd")
 
     def test_failed_add_update(self):
+        """ test l'unicité du kb et du title d'une MAJ """
         update = Update(kb="kb0514335", title="test update", description="an awsome test description", size="150kb", date=datetime.now(), infoUrl="http://test.fr")
         db.session.add(update)
         db.session.commit() 
@@ -44,7 +46,7 @@ class TestUpdates(Model, unittest.TestCase):
         db.session.rollback()
         
     def test_order_by_date(self):
-        """ query avec les updates les plus récentes en premier"""
+        """ test la query avec les updates les plus récentes en premier"""
         yesterday = (datetime.now() - timedelta(days=1))
         now = datetime.now()
         update = Update(kb="kb0514335", title="test update", date=now, infoUrl="http://test.fr")
@@ -53,7 +55,7 @@ class TestUpdates(Model, unittest.TestCase):
         db.session.add(update_yesterday)
         query = db.session.query(Update).order_by(Update.date.desc()).all()
         logger.debug(f"{query=}")
-        assert query != []
-        assert query[0].date == now
-        assert query[1].date == yesterday
+        self.assertNotEqual(query, [], "La recherche ne peut pas etre nulle")
+        self.assertEqual(query[0].date, now)
+        self.assertEqual(query[1].date, yesterday)
 
