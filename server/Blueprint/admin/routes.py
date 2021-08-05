@@ -33,7 +33,9 @@ def servers(page=1):
 @adminB.route("/add/server",methods=['GET','POST'])
 def add_server():
     form = ServerForm()
+    logger.debug("ajout d'un serveur")
     if form.validate_on_submit():
+        logger.debug("le formulaire est ok")
         newServer = Server()
         form.populate_obj(newServer)
         try:

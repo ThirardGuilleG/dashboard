@@ -34,6 +34,8 @@ def data():
 
 @updateB.route('/<int:idServer>')
 def update(idServer):
+    logger.debug(f"{idServer=}")
+    logger.debug(f"{db.session.query(UpdateAssociation).all()}")
     names = ['Titre mise à jour', "Taille Max(Mo)", "Demande un redémarrage", "Installé", "Lien + information", "date de sortie", "dernière MAJ"]
     # updates = UpdateAssociation.query.filter_by(idServer=idServeur).all()
     updates = db.session.query(UpdateAssociation).filter(and_(UpdateAssociation.idServer==idServer,UpdateAssociation.done==False)).join(Update, UpdateAssociation.update).all()
