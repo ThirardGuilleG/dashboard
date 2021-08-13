@@ -34,7 +34,7 @@ class TestServer(Model, unittest.TestCase):
         db.session.add(server_to_add)
         db.session.commit()
         test_server = Server.query.filter_by(name="test").first()
-        self.assertIsNone(test_server)
+        self.assertIsNotNone(test_server)
         self.assertFalse(test_server.active)
         self.assertFalse(test_server.rebootrequired)
 
