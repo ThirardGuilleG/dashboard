@@ -126,3 +126,20 @@ def server_view(idServer):
     services = Etat_Service.query.filter_by(id_server=idServer).first_or_404()
     server = Server.query.get_or_404(idServer)
     return render_template("services.html", services=services, server=server)
+
+
+@adminB.get("/services_view")
+def services_view():
+    """
+        View des serveurs pours lesquels un service n'est pas installé
+    """
+    servers_without_zabbix = [(Server.query.get(server.id_server).name, server.zabbix) for server in Etat_Service.query.filter_by(zabbix=0).order_by(Etat_Service.last_update_date).all()]
+    logger.debug(f"{servers_without_zabbix=}")
+    servers_without_graylog = [(Server.query.get(server.id_server).name, server.graylog_sidecar) for server in Etat_Service.query.filter_by(graylog_sidecar=0).order_by(Etat_Service.last_update_date).all()]
+    servers_without_eaton = [(Server.query.get(server.id_server).name, server.eaton) for server in Etat_Service.query.filter_by(eaton=0).order_by(Etat_Service.last_update_date).all()]
+    servers_without_fsecure = [(Server.query.get(server.id_server).name, server.fsecure) for server in Etat_Service.query.filter_by(fsecure=0).order_by(Etat_Service.last_update_date).all()]
+    servers_without_active_fsecure = [(Server.query.get(server.id_server).name, server.fsecure_activate) for server in Etat_Service.query.filter_by(fsecure_activate=0).order_by(Etat_Service.last_update_date).all()]
+    logger.debug(f"{servers_without_graylog=}")
+    logger.debug(f"{servers_without_eaton=}")
+    logger.debug(f"{servers_without_active_fsecure=}")
+    return ""
