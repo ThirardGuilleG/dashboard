@@ -14,13 +14,23 @@ function addRuleForPSUpdate($ServerName){
 }
 
 function fetch_updates($nameServer){
-    $updates = Get-WindowsUpdate -ComputerName $nameServer
-    return $updates | Select-Object Size,Status,ComputerName,KB,Title,Description,Deadline,IsDownloaded,IsInstalled,MoreInfoUrls,RebootRequired,LastDeploymentChangeTime
+    try {
+        $updates = Get-WindowsUpdate -ComputerName $nameServer -ErrorAction Stop
+        Write -host "fetch error $fetch_error"
+        return $updates | Select-Object Size,Status,ComputerName,KB,Title,Description,Deadline,IsDownloaded,IsInstalled,MoreInfoUrls,RebootRequired,LastDeploymentChangeTime
+    } catch {
+        $logger.error("[$($name)] Problème dans l'obtention des MAJ : $($_)");
+        Write-Host $_
+    }
 }
 
 function getHistory($name, $NumberDayToFetch){
-    $yesterday = Get-Date
-    $yesterday = $yesterday.AddDays(-5).ToString("yyyy-MM-dd")
-    return Get-WUHistory -ComputerName $Name -MaxDate $yesterday | Select-Object ComputerName, OperationName, Date, Title, Result, KB
+    try {
+        $yesterday = Get-Date
+        $yesterday = $yesterday.AddDays(-31).ToString("yyyy-MM-dd") 
+        return Get-WUHistory -ComputerName $Name -MaxDate $yesterday -ErrorAction Stop | Select-Object ComputerName, OperationName, Date, Title, Result, KB 
+    } catch {
+        $logger.error("[$($name)] Problème dans l'obtention de l'historique des MAJ : $($_)");
+        Write-Host $_
+    }
 }
-

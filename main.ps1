@@ -45,7 +45,6 @@ function main(){
         $toSend = @{'updates'=$result ;
         'history'=$historyUpdate;
         "needRestart"=$needRestart; 'server'= $Name}
-        $toSend
         $url = "$server_url/update/data"
         send_json -url $url -object_to_send $toSend
         # services
