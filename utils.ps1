@@ -111,7 +111,8 @@ class Logger{
 
     [void] send_graylog (
             [string]$msg,
-            [graylog_log_type]$log_type
+            [graylog_log_type]$log_type,
+            [pscustomobject]$optional_json
         )
     {
         <#
@@ -133,6 +134,7 @@ class Logger{
             host = $this.hostname
             log_type = $log_type.value__
             application = $this.application_name
+            more_information = $optional_json
         }
         $timestamp = Get-Date -Format o | ForEach-Object { $_ -replace ":", "." }
         Write-Host ("$($timestamp)---$($log_type)---$($msg)")
@@ -142,19 +144,23 @@ class Logger{
         }
     }
 
-    [void] info([string]$msg){
+    [void] info([string]$msg,
+                [pscustomobject]$optional_json){
         <#
         .SYNOPSIS
             Envoi d'un log d'information
         .PARAMETER msg
             message qui est envoyé
+        .PARAMETER optional_json
+            Object Powershell qui est décomposée par Graylog pour permettre de rahouter des champs
         .EXAMPLE
             info("A sample info message")
         #>
-        $this.send_graylog($msg, [graylog_log_type]::info)
+        $this.send_graylog($msg, [graylog_log_type]::info, $optional_json)
     }
 
-    [void] success([string]$msg){
+    [void] success([string]$msg,
+                    [pscustomobject]$optional_json){
         <#
         .SYNOPSIS
             Envoi d'un log de succés 
@@ -163,10 +169,11 @@ class Logger{
         .EXAMPLE
             info("A sample success message")
         #>
-        $this.send_graylog($msg, [graylog_log_type]::success)
+        $this.send_graylog($msg, [graylog_log_type]::success, $optional_json)
     }
 
-    [void] warning([string]$msg){
+    [void] warning([string]$msg,
+                [pscustomobject]$optional_json){
         <#
         .SYNOPSIS
             Envoi d'un log de warning
@@ -175,10 +182,11 @@ class Logger{
         .EXAMPLE
             info("A sample warning message")
         #>
-        $this.send_graylog($msg, [graylog_log_type]::warning)
+        $this.send_graylog($msg, [graylog_log_type]::warning, $optional_json)
     }
 
-    [void] error([string]$msg){
+    [void] error([string]$msg,
+                [pscustomobject]$optional_json){
         <#
         .SYNOPSIS
             Envoi d'un log d'erreur
@@ -187,10 +195,11 @@ class Logger{
         .EXAMPLE
             info("A sample error message")
         #>
-        $this.send_graylog($msg, [graylog_log_type]::error)
+        $this.send_graylog($msg, [graylog_log_type]::error, $optional_json)
     }
 
-    [void] critical([string]$msg){
+    [void] critical([string]$msg,
+                [pscustomobject]$optional_json){
         <#
         .SYNOPSIS
             Envoi d'un log critique
@@ -199,7 +208,7 @@ class Logger{
         .EXAMPLE
             info("A sample critical message")
         #>
-        $this.send_graylog($msg, [graylog_log_type]::critical)
+        $this.send_graylog($msg, [graylog_log_type]::critical, $optional_json)
     }
 
 }
